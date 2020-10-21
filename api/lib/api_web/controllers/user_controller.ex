@@ -8,8 +8,7 @@ defmodule ApiWeb.UserController do
   action_fallback ApiWeb.FallbackController
 
   def index(conn,  %{"email" => email, "username" => username}) do
-    user = Repo.get_by(User, [email: email, username: username])
-
+    user = Accounts.list_users(%{"email" => email, "username" => username})
     if user == nil do
       conn
       |> put_status(404)
@@ -19,7 +18,8 @@ defmodule ApiWeb.UserController do
       |> put_status(201)
       |> json(%{
         "email": user.email,
-        "username": user.username
+        "username": user.username,
+        "id": user.id
       })
     end
   end
@@ -36,10 +36,20 @@ defmodule ApiWeb.UserController do
   def show(conn, %{"userID" => id}) do
     if id != "all" do
       user = Accounts.get_user!(id)
+      if user == nil do
+        conn
+        |> put_status(404)
+        |> json(%{"error" => "{'credentials': ['user not found']}"})
+      end
       render(conn, "show.json", user: user)
     else
       user = Repo.all(User)
       |> Enum.map(&%{email: &1.email, username: &1.username, id: &1.id})
+      if user == [] do
+        conn
+        |> put_status(404)
+        |> json(%{"error" => "{'credentials': ['user not found']}"})
+      end
 
       conn
       |>put_status(200)
