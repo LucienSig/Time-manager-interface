@@ -28,7 +28,7 @@ defmodule ApiWeb.WorkingTimeController do
     else
       clock = Repo.all(WorkingTime)
       |> Enum.map(&%{start: &1.start, end: &1.end, id: &1.id, user: &1.user})
-      IO.inspect(clock)
+
       if clock == [] do
         conn
         |> put_status(404)

@@ -10,25 +10,39 @@ defmodule ApiWeb.ClockController do
   action_fallback ApiWeb.FallbackController
 
   def read(conn, %{"userID" => userID}) do
-    clock = Repo.get_by(Clock, [user: userID])
+    if userID != "all" do
+      clock = Repo.get_by(Clock, [user: userID])
 
-    if clock == nil do
+      if clock == nil do
+        conn
+        |> put_status(404)
+        |> json(%{"errors" => "{'credentials': ['clock not found']}"})
+      else
+        conn
+        |> put_status(201)
+        |> json(%{
+          "time": clock.time,
+          "status": clock.status,
+          "user": clock.user
+        })
+      end
+
       conn
-      |> put_status(404)
-      |> json(%{"errors" => "{'credentials': ['clock not found']}"})
+      |> put_status(401)
+      |> json(%{"id" => userID})
     else
-      conn
-      |> put_status(201)
-      |> json(%{
-        "time": clock.time,
-        "status": clock.status,
-        "user": clock.user
-      })
-    end
+      clock = Repo.all(Clock)
+      |> Enum.map(&%{time: &1.time, user: &1.user, status: &1.status})
+      if clock == [] do
+        conn
+        |> put_status(404)
+        |> json(%{"error" => "{'credentials': ['working time not found']}"})
+      end
 
-    conn
-    |> put_status(401)
-    |> json(%{"id" => userID})
+      conn
+      |>put_status(200)
+      |> json(clock)
+    end
   end
 
   def create(conn, %{"userID" => userID}) do
