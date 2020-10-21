@@ -7,8 +7,9 @@ module.exports = {
     plugins: [
       new webpack.optimize.LimitChunkCountPlugin({
         maxChunks: 6
-      })
-    ]
+      }),
+      new webpack.ProvidePlugin({ jQuery: 'jquery'})
+    ],
   },
   pwa: {
     name: 'Vue Argon Dashboard',

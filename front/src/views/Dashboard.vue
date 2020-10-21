@@ -1,10 +1,10 @@
 <template>
     <div>
-        <base-header type="gradient-success" class="pb-6 pb-8 pt-5 pt-md-8">
+        <base-header type="gradient-primary" class="pb-6 pb-8 pt-5 pt-md-8">
             <!-- Card stats -->
             <div class="row">
-                <div class="col-xl-3 col-lg-6">
-                    <stats-card title="Total traffic"
+                <div class="col-xl-4 col-lg-4">
+                    <stats-card title="Total employees"
                                 type="gradient-red"
                                 sub-title="350,897"
                                 icon="ni ni-active-40"
@@ -13,12 +13,12 @@
 
                         <template slot="footer">
                             <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
-                            <span class="text-nowrap">Since last month</span>
+                            <span class="text-nowrap">Total employees</span>
                         </template>
                     </stats-card>
                 </div>
-                <div class="col-xl-3 col-lg-6">
-                    <stats-card title="Total traffic"
+                <div class="col-xl-4 col-lg-4">
+                    <stats-card title="Working time average"
                                 type="gradient-orange"
                                 sub-title="2,356"
                                 icon="ni ni-chart-pie-35"
@@ -27,12 +27,12 @@
 
                         <template slot="footer">
                             <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 12.18%</span>
-                            <span class="text-nowrap">Since last month</span>
+                            <span class="text-nowrap">Working time average</span>
                         </template>
                     </stats-card>
                 </div>
-                <div class="col-xl-3 col-lg-6">
-                    <stats-card title="Sales"
+                <div class="col-xl-4 col-lg-4">
+                    <stats-card title="Total working time"
                                 type="gradient-green"
                                 sub-title="924"
                                 icon="ni ni-money-coins"
@@ -41,25 +41,12 @@
 
                         <template slot="footer">
                             <span class="text-danger mr-2"><i class="fa fa-arrow-down"></i> 5.72%</span>
-                            <span class="text-nowrap">Since last month</span>
+                            <span class="text-nowrap">Total working time</span>
                         </template>
                     </stats-card>
 
                 </div>
-                <div class="col-xl-3 col-lg-6">
-                    <stats-card title="Performance"
-                                type="gradient-info"
-                                sub-title="49,65%"
-                                icon="ni ni-chart-bar-32"
-                                class="mb-4 mb-xl-0"
-                    >
-
-                        <template slot="footer">
-                            <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 54.8%</span>
-                            <span class="text-nowrap">Since last month</span>
-                        </template>
-                    </stats-card>
-                </div>
+                
             </div>
         </base-header>
 
@@ -71,7 +58,7 @@
                         <div slot="header" class="row align-items-center">
                             <div class="col">
                                 <h6 class="text-light text-uppercase ls-1 mb-1">Overview</h6>
-                                <h5 class="h3 text-white mb-0">Sales value</h5>
+                                <h5 class="h3 text-white mb-0">Working time</h5>
                             </div>
                             <div class="col">
                                 <ul class="nav nav-pills justify-content-end">
@@ -144,7 +131,7 @@
 <script>
   // Charts
   import * as chartConfigs from '@/components/Charts/config';
-  import LineChart from '@/components/Charts/LineChart';
+  import LineChart from '../components/Charts/LineChart.vue';
   import BarChart from '@/components/Charts/BarChart';
 
   // Tables
