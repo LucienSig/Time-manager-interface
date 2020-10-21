@@ -34,8 +34,17 @@ defmodule ApiWeb.UserController do
   end
 
   def show(conn, %{"userID" => id}) do
-    user = Accounts.get_user!(id)
-    render(conn, "show.json", user: user)
+    if id != "all" do
+      user = Accounts.get_user!(id)
+      render(conn, "show.json", user: user)
+    else
+      user = Repo.all(User)
+      |> Enum.map(&%{email: &1.email, username: &1.username, id: &1.id})
+
+      conn
+      |>put_status(200)
+      |> json(user)
+    end
   end
 
   def update(conn, %{"userID" => id, "email" => email, "username" => username}) do
