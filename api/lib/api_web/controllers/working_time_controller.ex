@@ -10,19 +10,34 @@ defmodule ApiWeb.WorkingTimeController do
   action_fallback ApiWeb.FallbackController
 
   def index(conn, %{"userID" => id}) do
-    where = [id: id]
-    select = [:id]
-    query = from User, where: ^where, select: ^select
+    if id != "all" do
+      where = [id: id]
+      select = [:id]
+      query = from User, where: ^where, select: ^select
 
-    workingtime = Repo.one(query)
+      workingtime = Repo.one(query)
 
-    if workingtime == nil do
-      conn
-      |> put_status(404)
-      |> json(%{"errors" => "{'credentials': ['user not found']}"})
+      if workingtime == nil do
+        conn
+        |> put_status(404)
+        |> json(%{"errors" => "{'credentials': ['user not found']}"})
+      else
+        workingtimes = Time.list_workingtimes(%{"userID" => id})
+        render(conn, "index.json", workingtimes: workingtimes)
+      end
     else
-      workingtimes = Time.list_workingtimes(%{"userID" => id})
-      render(conn, "index.json", workingtimes: workingtimes)
+      clock = Repo.all(WorkingTime)
+      |> Enum.map(&%{start: &1.start, end: &1.end, id: &1.id, user: &1.user})
+      IO.inspect(clock)
+      if clock == [] do
+        conn
+        |> put_status(404)
+        |> json(%{"error" => "{'credentials': ['working time not found']}"})
+      end
+
+      conn
+      |>put_status(200)
+      |> json(clock)
     end
   end
 
