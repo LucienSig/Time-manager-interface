@@ -15,9 +15,9 @@ defmodule ApiWeb.WorkingTimeController do
       select = [:id]
       query = from User, where: ^where, select: ^select
 
-      workingtime = Repo.one(query)
+      user = Repo.one(query)
 
-      if workingtime == nil do
+      if user == nil do
         conn
         |> put_status(404)
         |> json(%{"errors" => "{'credentials': ['user not found']}"})

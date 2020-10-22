@@ -11,34 +11,35 @@ defmodule ApiWeb.ClockController do
 
   def read(conn, %{"userID" => userID}) do
     if userID != "all" do
-      clock = Repo.get_by(Clock, [user: userID])
-
-      if clock == nil do
+      where = [id: userID]
+      select = [:id]
+      query = from User, where: ^where, select: ^select
+      user = Repo.one(query)
+      if user != nil do
+        clock = Time.list_clocks(%{"userID" => userID})
+        if clock == [] do
+          conn
+          |> put_status(404)
+          |> json(%{"errors" => "{'credentials': ['no clocks for selected user']}"})
+        else
+          render(conn, "index.json", clocks: clock)
+        end
         conn
-        |> put_status(404)
-        |> json(%{"errors" => "{'credentials': ['clock not found']}"})
+        |> put_status(401)
+        |> json(%{"id" => userID})
       else
         conn
-        |> put_status(201)
-        |> json(%{
-          "time": clock.time,
-          "status": clock.status,
-          "user": clock.user
-        })
+        |> put_status(404)
+        |> json(%{"error" => "{'credentials' : ['no user found']}"})
       end
-
-      conn
-      |> put_status(401)
-      |> json(%{"id" => userID})
     else
       clock = Repo.all(Clock)
       |> Enum.map(&%{time: &1.time, user: &1.user, status: &1.status})
       if clock == [] do
         conn
         |> put_status(404)
-        |> json(%{"error" => "{'credentials': ['working time not found']}"})
+        |> json(%{"error" => "{'credentials': ['clock not found']}"})
       end
-
       conn
       |>put_status(200)
       |> json(clock)
@@ -47,42 +48,32 @@ defmodule ApiWeb.ClockController do
 
   def create(conn, %{"userID" => userID}) do
     count = Repo.all(from u in "clocks", select: fragment("count(*)"))
-
     id = List.first(count)
     user_tmp = Repo.get_by(User, [id: userID])
-    clock = Repo.get_by(Clock, [user: userID])
-
+    clock = Time.list_clocks(%{"userID" => userID})
+    |> Enum.map(&%{time: &1.time, user: &1.user, status: &1.status})
     if user_tmp do
-      if clock do
-        time = NaiveDateTime.utc_now()
-        status = !clock.status
-
-        changeset = Clock.changeset(clock, %{"time" => time, "status" => status, "user" => userID})
-        case Repo.update(changeset) do
-          {:ok, clock} ->
-          conn
-          |> put_status(200)
-          |> json(%{"Reponse" => "Updated", "time" => time, "status" => status, "user" => userID})
-          {:error, result} ->
-          conn
-          |> put_status(404)
-          |> json(%{"errors" => "{'credentials': ['no user found']}"})
-        end
-      else
-        status = true
         date = NaiveDateTime.utc_now()
-        changeset = Clock.changeset(%Clock{}, %{"id" => id, "status" => status, "time" => date, "user" => userID})
-
-        case Repo.insert(changeset) do
-          {:ok, _user} ->
-            json(conn |> put_status(:created), %{success: "Created"})
-
-          {:error, changeset} ->
-            errors = "#{inspect(changeset.errors)}" |> String.replace("[", "(") |> String.replace("]", ")") |> String.replace("{", "[") |> String.replace("}", "]") |> String.replace("(", "{") |> String.replace(")", "}") |> String.replace(" :", " ")
-
-            json(conn |> put_status(:bad_request), %{errors: errors})
+        if clock != [] do
+          status = !List.last(clock).status
+          changeset = Clock.changeset(%Clock{}, %{"id" => id, "status" => status, "time" => date, "user" => userID})
+          case Repo.insert(changeset) do
+            {:ok, _user} ->
+              json(conn |> put_status(:created), %{success: "Created", status: status})
+            {:error, changeset} ->
+              errors = "#{inspect(changeset.errors)}" |> String.replace("[", "(") |> String.replace("]", ")") |> String.replace("{", "[") |> String.replace("}", "]") |> String.replace("(", "{") |> String.replace(")", "}") |> String.replace(" :", " ")
+              json(conn |> put_status(:bad_request), %{errors: errors})
+          end
+        else
+          changeset = Clock.changeset(%Clock{}, %{"id" => id, "status" => true, "time" => date, "user" => userID})
+          case Repo.insert(changeset) do
+            {:ok, _user} ->
+              json(conn |> put_status(:created), %{success: "Created", status: true})
+            {:error, changeset} ->
+              errors = "#{inspect(changeset.errors)}" |> String.replace("[", "(") |> String.replace("]", ")") |> String.replace("{", "[") |> String.replace("}", "]") |> String.replace("(", "{") |> String.replace(")", "}") |> String.replace(" :", " ")
+              json(conn |> put_status(:bad_request), %{errors: errors})
+          end
         end
-      end
     else
       conn
       |> put_status(404)

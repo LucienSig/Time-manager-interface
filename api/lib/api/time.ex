@@ -90,6 +90,14 @@ defmodule Api.Time do
     Repo.delete(clock)
   end
 
+  def list_clocks (%{"userID" => id}) do
+    where = [user: id]
+    select = [:status, :time, :id, :user]
+    query = from Clock, where: ^where, select: ^select
+
+    Repo.all(query)
+  end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking clock changes.
 
