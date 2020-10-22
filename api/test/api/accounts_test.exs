@@ -31,7 +31,7 @@ defmodule Api.AccountsTest do
 
     test "create_user/1 with valid data creates a user" do
       assert {:ok, %User{} = user} = Accounts.create_user(@valid_attrs)
-      assert user.email == "some email"
+      assert user.email == "someemail@gmail.com"
       assert user.is_active == true
       assert user.username == "some username"
     end
