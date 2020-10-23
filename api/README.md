@@ -19,3 +19,7 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Forum: https://elixirforum.com/c/phoenix-forum
   * Source: https://github.com/phoenixframework/phoenix
 # Time-manager-interface
+
+# docker
+To run docker :
+  * run <code>docker-compose run web mix ecto.create && docker-compose run web mix ecto.migrate && docker-compose up</code>
