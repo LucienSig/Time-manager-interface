@@ -148,9 +148,11 @@
           </td>
           <td>
             <a class="btn btn-lg btn-success"
+              @click="clock(row.id)"
+              v-if="clocks[row.id]"
               ><i class="fas fa-user-check text-white"></i
             ></a>
-            <a class="btn btn-lg btn-danger"
+            <a class="btn btn-lg btn-danger" v-else @click="clock(row.id)"
               ><i class="fas fa-user-times text-white"></i
             ></a>
           </td>
@@ -179,6 +181,7 @@ export default {
     return {
       users: [],
       user: {},
+      clocks: {},
       success: "",
       errors: {
         email: [],
@@ -195,27 +198,49 @@ export default {
         .get("http://localhost:4000/api/users/all")
         .then((response) => {
           this.users = response.data;
+          this.users.forEach(element => {
+            this.setUserClock(element.id);
+          });
         })
         .catch((error) => {
           console.log(error);
         });
     },
+    setUserClock (id) {
+      axios.get("http://localhost:4000/api/clocks/" + id)
+      .then((response) => {
+        let clockLength = response.data.data.length;
+        this.clocks[id] = response.data.data[clockLength -1].status;
+      })
+      .catch(() => {
+        this.clocks[id] = false;
+      })
+    },
     selectUser(id) {
+      this.success = "";
+      this.clearErrorMessage();
       axios
         .get("http://localhost:4000/api/users/" + id)
         .then((response) => {
-          console.log(response.data);
           this.user = response.data.data;
+          this.getUserWorkingTimes();
         })
         .catch((error) => {
           console.log(error);
         });
+    },
+    clock(id) {
+      axios.post("http://localhost:4000/api/clocks/" + id)
+      .then((response) => {
+        this.clocks[id] = response.data.status;
+        this.readAllUsers();
+      })
     },
     deleteUser(id) {
       axios
         .delete("http://localhost:4000/api/users/" + id)
         .then(() => {
-          this.success = "User deleted"
+          this.success = "User deleted";
         })
         .catch((error) => {
           console.log(error.response);
@@ -234,18 +259,28 @@ export default {
     },
     getUserWorkingTimes () {
         axios
-        .get("http://localhost:4000/api/users/" + this.user.id)
-        .then(() => {
-          this.success = "User deleted"
+        .get("http://localhost:4000/api/workingtimes/" + this.user.id)
+        .then((response) => {
+          let dates = response.data.data;
+          dates.forEach(date => {
+            let dateNow = new Date();
+            let startTimeStamp = new Date(Date.parse(date.start));
+            let getDay = new Date(Date.parse(date.start)).getDay();
+            let hour = new Date(Date.parse(date.start)).getHours();
+
+            let dayCell = document.querySelector('div[data-day="' +  String(getDay) + '"][data-hour="' +  String(hour) + '"]');
+
+            if (dateNow < startTimeStamp) {
+              dayCell.classList.add('bg-success');
+            }
+
+          });
         })
         .catch((error) => {
           console.log(error.response);
         });
     },
     createWorkingTimes(start, end) {
-
-        console.log(start);
-        console.log(end);
 
         let form = new FormData();
         
@@ -261,7 +296,37 @@ export default {
           console.log(error)
         })
     },
+    deleteWorkingTime (id) {
+      axios
+        .delete("http://localhost:4000/api/workingtimes/" + id)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+    },
+    deleteWorkingTimes () {
+        axios
+        .get("http://localhost:4000/api/workingtimes/" + this.user.id)
+        .then((response) => {
+          let dates = response.data.data;
+          dates.forEach(date => {
+            let dateNow = new Date();
+            let startTimeStamp = new Date(Date.parse(date.start));
+
+            if (dateNow < startTimeStamp) {
+              this.deleteWorkingTime(date.id);
+            }
+
+          });
+        })
+        .catch((error) => {
+          console.log(error.response);
+        });
+    },
     saveWorkingTimes () {
+      this.deleteWorkingTimes();
       let currentDate = new Date();
       let currentYear = currentDate.getFullYear();
       let currentMonth = currentDate.getMonth() + 1;

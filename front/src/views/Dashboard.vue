@@ -91,47 +91,38 @@
           <stats-card
             title="Total employees"
             type="gradient-red"
-            sub-title="350,897"
+            :sub-title="totalUsers"
             icon="ni ni-active-40"
             class="mb-4 mb-xl-0"
           >
             <template slot="footer">
-              <span class="text-success mr-2"
-                ><i class="fa fa-arrow-up"></i> 3.48%</span
-              >
-              <span class="text-nowrap">Total employees</span>
+              <span class="text-nowrap">Enterprise employee</span>
             </template>
           </stats-card>
         </div>
         <div class="col-xl-4 col-lg-4">
           <stats-card
-            title="Working time average"
+            title="Working time average (contractual)"
             type="gradient-orange"
-            sub-title="2,356"
+            :sub-title="workingTimesAverage.toFixed(2)"
             icon="ni ni-chart-pie-35"
             class="mb-4 mb-xl-0"
           >
             <template slot="footer">
-              <span class="text-success mr-2"
-                ><i class="fa fa-arrow-up"></i> 12.18%</span
-              >
-              <span class="text-nowrap">Working time average</span>
+              <span class="text-nowrap">Working time average scheduled</span>
             </template>
           </stats-card>
         </div>
         <div class="col-xl-4 col-lg-4">
           <stats-card
-            title="Total working time"
+            title="Total worked time average"
             type="gradient-green"
-            sub-title="924"
+            :sub-title="workedTimeAverage.toFixed(3)"
             icon="ni ni-money-coins"
             class="mb-4 mb-xl-0"
           >
             <template slot="footer">
-              <span class="text-danger mr-2"
-                ><i class="fa fa-arrow-down"></i> 5.72%</span
-              >
-              <span class="text-nowrap">Total working time</span>
+              <span class="text-nowrap">Effectiv worked time average</span>
             </template>
           </stats-card>
         </div>
@@ -282,6 +273,9 @@ export default {
         email: [],
         username: [],
       },
+      totalUsers: "",
+      workingTimesCount: "",
+      workingTimesAverage: 0
     };
   },
   methods: {
@@ -321,6 +315,62 @@ export default {
           }
         });
     },
+    getAllUsers () {
+        axios
+        .get("http://localhost:4000/api/users/all")
+        .then((response) => {
+          this.totalUsers = response.data.length;
+        })
+    },
+    getWorkingTimesAverage () {
+        axios
+        .get("http://localhost:4000/api/workingtimes/all")
+        .then((response) => {
+          let workingTimesCount = response.data.length;
+          let totalHour = 0;
+
+          response.data.forEach(element => {
+            let start = element["start"];
+            let end = element["end"];
+
+            start =  Date.parse(start);
+            end = Date.parse(end);
+            
+            let dateDifference = new Date(Math.abs(start - end)).getHours();
+            totalHour += dateDifference
+          });
+
+          this.workingTimesAverage = totalHour/workingTimesCount
+        })
+    },
+    computeWorkedTimeAverage(days) {
+      let start = "";
+      let workedTime = 0;
+      let clockCount = 0;
+
+      days.forEach((element, index) => {
+        if (index % 2 == 0) {
+          start = element.time
+        } else {
+          let end = element.time
+          start =  Date.parse(start);
+          end = Date.parse(end);
+          clockCount += 1;
+          workedTime += new Date(Math.abs(start - end)).getMinutes();
+        }
+      });
+
+      this.workedTimeAverage = (workedTime/clockCount)/60;
+
+    },
+    getWorkedTimesAverage () {
+        axios
+        .get("http://localhost:4000/api/clocks/all")
+        .then((response) => {
+          console.log(response.data);
+          this.computeWorkedTimeAverage(response.data)
+        })
+    },
     clearErrorMessage() {
       this.success = "";
       for (const key in this.errors) {
@@ -330,6 +380,9 @@ export default {
   },
   mounted() {
     this.initBigChart(0);
+    this.getAllUsers();
+    this.getWorkingTimesAverage();
+    this.getWorkedTimesAverage();
   },
 };
 </script>
