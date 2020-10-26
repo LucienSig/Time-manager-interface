@@ -28,10 +28,10 @@ defmodule ApiWeb.Router do
     post "/clocks/:userID", ClockController, :create
 
     # Charts
-    get "/charts/:id", ChartController, :show
-    get "/charts", ChartController, :index
+    get "/charts/:userID", ChartController, :index
+    get "/charts/:userID/:chartID", ChartController, :show
     post "/charts", ChartController, :create
-    put "/charts/:id", ChartController, :update
+    put "/charts/:chartID", ChartController, :change
   end
 
   # Other scopes may use custom stacks.

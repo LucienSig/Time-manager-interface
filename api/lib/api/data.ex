@@ -17,8 +17,12 @@ defmodule Api.Data do
       [%Chart{}, ...]
 
   """
-  def list_charts do
-    Repo.all(Chart)
+  def list_charts (%{"userID" => id}) do
+    where = [user_id: id]
+    select = [:line, :bar, :donut, :id, :user_id]
+    query = from Chart, where: ^where, select: ^select
+
+    Repo.all(query)
   end
 
   @doc """
@@ -35,7 +39,13 @@ defmodule Api.Data do
       ** (Ecto.NoResultsError)
 
   """
-  def get_chart!(id), do: Repo.get!(Chart, id)
+  def get_chart!(%{"userID" => id, "chartID" => chartID}) do
+    where = [user_id: id, id: chartID]
+    select = [:line, :bar, :donut, :user_id, :id]
+    query = from Chart, where: ^where, select: ^select
+
+    Repo.one(query)
+  end
 
   @doc """
   Creates a chart.
