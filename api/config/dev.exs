@@ -1,7 +1,6 @@
 use Mix.Config
 
-database_url = System.get_env("DATABASE_URL")
-
+database_url = "postgres://postgres:postgres@db:5432/api_dev"
 # Configure your database
 config :api, Api.Repo,
   url: database_url,
