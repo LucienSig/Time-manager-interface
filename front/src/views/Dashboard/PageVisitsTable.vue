@@ -8,7 +8,7 @@
       role="dialog"
       aria-labelledby="editModal"
       aria-hidden="true"
-    >
+    > 
       <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -125,7 +125,7 @@
           <h3 class="mb-0">Employees</h3>
         </div>
         <div class="col text-right">
-          <a href="#!" class="btn btn-lg btn-warning">Overview</a>
+          <a @click="displayInformations('all')" class="btn btn-lg btn-warning text-white">Overview</a>
         </div>
       </div>
     </div>
@@ -140,16 +140,16 @@
         </template>
 
         <template slot-scope="{ row }">
-          <th scope="row">
+          <th scope="row" @click="displayInformations(row.id)" class="cursor-pointer">
             <div class="mt-3">{{ row.username }}</div>
           </th>
-          <td>
+          <td @click="displayInformations(row.id)" class="cursor-pointer">
             <div class="mt-3">{{ row.email }}</div>
           </td>
-          <td>
+          <td :key="clockKey" class="cursor-pointer">
             <a class="btn btn-lg btn-success"
               @click="clock(row.id)"
-              v-if="clocks[row.id]"
+              v-if="clocks[row.id] == true"
               ><i class="fas fa-user-check text-white"></i
             ></a>
             <a class="btn btn-lg btn-danger" v-else @click="clock(row.id)"
@@ -174,6 +174,7 @@
 import axios from "axios";
 import isValidDate from 'is-valid-date';
 import moment from 'moment';
+import { EventBus } from "../../store/event-bus";
 
 export default {
   name: "page-visits-table",
@@ -187,15 +188,19 @@ export default {
         email: [],
         username: [],
       },
+      clockKey: 0
     };
   },
-  mounted() {
+  beforeMount () {
     this.readAllUsers();
   },
   methods: {
+    displayInformations(id) {
+      EventBus.$emit('userID', id);
+    },
     readAllUsers() {
       axios
-        .get("http://localhost:4000/api/users/all")
+        .get("http://3.127.5.177:4000/api/users/all")
         .then((response) => {
           this.users = response.data;
           this.users.forEach(element => {
@@ -207,20 +212,22 @@ export default {
         });
     },
     setUserClock (id) {
-      axios.get("http://localhost:4000/api/clocks/" + id)
+      axios.get("http://3.127.5.177:4000/api/clocks/" + id)
       .then((response) => {
         let clockLength = response.data.data.length;
         this.clocks[id] = response.data.data[clockLength -1].status;
+        this.clockKey += 1;
       })
       .catch(() => {
         this.clocks[id] = false;
+        this.clockKey += 1;
       })
     },
     selectUser(id) {
       this.success = "";
       this.clearErrorMessage();
       axios
-        .get("http://localhost:4000/api/users/" + id)
+        .get("http://3.127.5.177:4000/api/users/" + id)
         .then((response) => {
           this.user = response.data.data;
           this.getUserWorkingTimes();
@@ -230,7 +237,7 @@ export default {
         });
     },
     clock(id) {
-      axios.post("http://localhost:4000/api/clocks/" + id)
+      axios.post("http://3.127.5.177:4000/api/clocks/" + id)
       .then((response) => {
         this.clocks[id] = response.data.status;
         this.readAllUsers();
@@ -238,7 +245,7 @@ export default {
     },
     deleteUser(id) {
       axios
-        .delete("http://localhost:4000/api/users/" + id)
+        .delete("http://3.127.5.177:4000/api/users/" + id)
         .then(() => {
           this.success = "User deleted";
         })
@@ -259,19 +266,32 @@ export default {
     },
     getUserWorkingTimes () {
         axios
-        .get("http://localhost:4000/api/workingtimes/" + this.user.id)
+        .get("http://3.127.5.177:4000/api/workingtimes/" + this.user.id)
         .then((response) => {
           let dates = response.data.data;
           dates.forEach(date => {
-            let dateNow = new Date();
+            // let dateNow = new Date();
             let startTimeStamp = new Date(Date.parse(date.start));
             let getDay = new Date(Date.parse(date.start)).getDay();
-            let hour = new Date(Date.parse(date.start)).getHours();
+            let start = new Date(Date.parse(date.start)).getHours();
+            let end = new Date(Date.parse(date.end)).getHours();
 
-            let dayCell = document.querySelector('div[data-day="' +  String(getDay) + '"][data-hour="' +  String(hour) + '"]');
+            console.log(start);
+            console.log(end);
 
-            if (dateNow < startTimeStamp) {
-              dayCell.classList.add('bg-success');
+            for (let index = start; index <= end; index++) {
+              let dayCell = document.querySelector('div[data-day="' +  String(getDay) + '"][data-hour="' +  String(index) + '"]');
+              
+              if(startTimeStamp.getMonth() >= new Date().getMonth() && startTimeStamp.getFullYear() >= new Date().getFullYear()) {
+
+                if (startTimeStamp.getMonth() == new Date().getMonth() && startTimeStamp.getFullYear() == new Date().getFullYear() && startTimeStamp.getDate() >= new Date().getDate()) {
+                  dayCell.classList.add('bg-success');
+                } else if (startTimeStamp.getMonth() == new Date().getMonth() && startTimeStamp.getFullYear() == new Date().getFullYear() && startTimeStamp.getDate() < new Date().getDate()) {
+                  //
+                } else {
+                  dayCell.classList.add('bg-success');
+                }
+              }
             }
 
           });
@@ -288,7 +308,7 @@ export default {
         form.append('end', end);
 
         axios
-        .post("http://localhost:4000/api/workingtimes/" + this.user.id, form)
+        .post("http://3.127.5.177:4000/api/workingtimes/" + this.user.id, form)
         .then((response) => {
           console.log(response.data)
         })
@@ -298,7 +318,7 @@ export default {
     },
     deleteWorkingTime (id) {
       axios
-        .delete("http://localhost:4000/api/workingtimes/" + id)
+        .delete("http://3.127.5.177:4000/api/workingtimes/" + id)
         .then((response) => {
           console.log(response.data);
         })
@@ -308,25 +328,29 @@ export default {
     },
     deleteWorkingTimes () {
         axios
-        .get("http://localhost:4000/api/workingtimes/" + this.user.id)
+        .get("http://3.127.5.177:4000/api/workingtimes/" + this.user.id)
         .then((response) => {
           let dates = response.data.data;
           dates.forEach(date => {
             let dateNow = new Date();
             let startTimeStamp = new Date(Date.parse(date.start));
 
-            if (dateNow < startTimeStamp) {
-              this.deleteWorkingTime(date.id);
+            if (startTimeStamp > dateNow) {
+                this.deleteWorkingTime(date.id);
             }
 
           });
+        })
+        .then(() => {
+          setTimeout(() => {
+            this.addWorkingTimes();
+          }, 3000)
         })
         .catch((error) => {
           console.log(error.response);
         });
     },
-    saveWorkingTimes () {
-      this.deleteWorkingTimes();
+    addWorkingTimes () {
       let currentDate = new Date();
       let currentYear = currentDate.getFullYear();
       let currentMonth = currentDate.getMonth() + 1;
@@ -344,17 +368,21 @@ export default {
               let startHour = allDataDay[0].getAttribute('data-hour');
               let endHour = allDataDay[allDataDay.length - 1].getAttribute('data-hour');
 
-              let start = moment(String(fullDate + " " + startHour +":00:00")).format("YYYY-MM-DD hh:mm:ss");
-              let end = moment(String(fullDate + " " + endHour +":00:00")).format("YYYY-MM-DD hh:mm:ss");
-              this.createWorkingTimes(start, end);
+              let start = moment(String(fullDate + " " + String(startHour) +":00:00")).format("YYYY-MM-DD hh:mm:ss");
+              let end = moment(String(fullDate + " " + String(endHour) +":00:00")).format("YYYY-MM-DD hh:mm:ss");
+
+              setTimeout(() => {
+                this.createWorkingTimes(start, end);
+              }, 2000);
 
             }
             // is valid
           }
         }
       }
-
-
+    },
+    saveWorkingTimes () {
+      this.deleteWorkingTimes();
     },
     editUser() {
 
@@ -364,12 +392,12 @@ export default {
       form.append("username", this.user.username);
 
       axios
-        .put("http://localhost:4000/api/users/" + this.user.id, form)
+        .put("http://3.127.5.177:4000/api/users/" + this.user.id, form)
         .then((response) => {
           this.saveWorkingTimes();
           this.user = response.data.data;
           this.clearErrorMessage();
-          this.success = "User created";
+          this.success = "User updated";
           this.readAllUsers();
         })
         .catch((error) => {

@@ -1,81 +1,29 @@
-
 <template>
   <div id="app">
-    <div class="container">
-      <div class="col-12 panel panel-default">
-        <div class="panel-body">
-          <div class="col-12">
-            <div v-if="lineData.length != 0" :key="lineChartKey">
-              <line-chart
-                id="line"
-                :data="lineData"
-                xkey="year"
-                ykeys='[ "a" ]'
-                resize="true"
-                labels='[ "Serie A"]'
-                line-colors='[ "#FF6384" ]'
-                grid="true"
-                grid-text-weight="bold"
-                parse-time="false"
-              >
-              </line-chart>
-            </div>
-            <div v-else>No Data</div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <donut-chart id="donut" :data="donutData" colors='[ "#FF6384", "#36A2EB", "#FFCE56", "orange", "#825ee4"]' resize="true" width="400"></donut-chart>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import Raphael from "raphael/raphael";
-global.Raphael = Raphael;
-import { LineChart } from "vue-morris";
+import Raphael from 'raphael/raphael'
+global.Raphael = Raphael
+import { DonutChart } from 'vue-morris'
+import axios from "axios"
 import { EventBus } from "../../store/event-bus";
 
 
 export default {
-  name: "app",
-  data() {
+  name: 'app',
+  data () {
     return {
-      lineData: [],
-      lineChartKey: 0,
-      userID: 'all',
-      workingTimes: {
-        "Mon.": {
-            average: 0,
-            totalWorkedTime: 0,
-            count: 0
-        },
-        "Tue.": {
-            average: 0,
-            totalWorkedTime: 0,
-            count: 0
-        },
-        "Wed.": {
-            average: 0,
-            totalWorkedTime: 0,
-            count: 0
-        },
-        "Thu.": {
-            average: 0,
-            totalWorkedTime: 0,
-            count: 0
-        },
-        "Fri.": {
-            average: 0,
-            totalWorkedTime: 0,
-            count: 0
-        }
-      }
-    };
+      donutData: [      ],
+      userID: 'all'
+    }
   },
   components: {
-    LineChart,
+    DonutChart
   },
-  mounted() {
+  mounted () {
     this.computeWorkingTimesStats();
     EventBus.$on('userID', (userID) => {
       this.userID = userID;
@@ -134,7 +82,7 @@ export default {
             start = Date.parse(start);
             end = Date.parse(end);
 
-            day = new Date(start).getDay() - 1;
+            day = new Date(start).getDay();
             console.log(days[day]);
 
             if (start > now) {
@@ -149,14 +97,16 @@ export default {
 
     },
     setLineCharts(workingTimesStats) {
-      this.lineData = [
-        { year: "Mon.", a: workingTimesStats["Mon."]["average"], b: 0 },
-        { year: "Tue.", a: workingTimesStats["Tue."]["average"], b: 0 },
-        { year: "Wed.", a: workingTimesStats["Wed."]["average"], b: 0 },
-        { year: "Thu.", a: workingTimesStats["Thu."]["average"], b: 0 },
-        { year: "Fri.", a: workingTimesStats["Fri."]["average"], b: 0 },
+
+this.donutData = [
+        { label: "Mon.", value: workingTimesStats["Mon."]["average"] },
+        { label: "Tue.", value: workingTimesStats["Tue."]["average"] },
+        { label: "Wed.", value: workingTimesStats["Wed."]["average"] },
+        { label: "Thu.", value: workingTimesStats["Thu."]["average"] },
+        { label: "Fri.", value: workingTimesStats["Fri."]["average"] },
       ];
+
     },
-  },
-};
+  }
+}
 </script>
