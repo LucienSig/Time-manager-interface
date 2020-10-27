@@ -36,5 +36,5 @@ jobs:
       - run:
           name: Get directory inside folder
           command: |
-            cd ./docker_psql && service docker start && docker-compose up 
+            cd ./docker_psql && dockerd && docker-compose up 
   
