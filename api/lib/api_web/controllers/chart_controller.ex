@@ -91,15 +91,20 @@ defmodule ApiWeb.ChartController do
 
   end
 
-  def change(conn, %{"chartID" => chartID, "line" => line, "bar" => bar, "donut" => donut}) do
-    chart = Repo.get(Chart, chartID)
+  def change(conn, %{"userID" => userID, "line" => line, "bar" => bar, "donut" => donut}) do
+    where = [user_id: userID]
+    select = [:line, :bar, :donut, :user_id, :id]
+    query = from Chart, where: ^where, select: ^select
+
+    user = Repo.one(query)
+    chart = Repo.get(Chart, user.id)
     if chart do
-      changeset = Chart.changeset(chart, %{"line" => line, "bar" => bar, "donut" => donut, "id" => chartID})
+      changeset = Chart.changeset(chart, %{"line" => line, "bar" => bar, "donut" => donut})
       case Repo.update(changeset) do
         {:ok, chart} ->
           conn
           |> put_status(200)
-          |>json(%{"Response" => "Updated", "line" => line, "bar" => bar, "donut" => donut, "id" => chartID})
+          |>json(%{"Response" => "Updated", "line" => line, "bar" => bar, "donut" => donut})
         {:error, result} ->
           conn
           |> put_status(404)
