@@ -1,11 +1,38 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
-version: 2.1
+version: 2
+jobs:
+  build:
+       
+    working_directory: '~/docker_psql'
+    
 
-jobs: 
-  steps:
-    checkout
-    run: curl -L https://github.com/docker/compose/releases/download/1.25.3/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-    run: chmod +x ~/docker-compose
-    run: sudo mv ~/docker-compose /usr/local/bin/docker-compose
-    run: docker-compose up -d ./api/docker-compose.yml
-    run: docker-compose up -d ./docker_psql/docker-compose.yml
+
+    steps:
+      - checkout
+      - run: 'pwd'
+      - run: 'ls'
+      
+      # This should go into custom primary image, here's only for the sake of explanation
+      - run:
+          name: Install Docker client
+          command: |
+            set -x
+            VER="17.03.0-ce"
+            curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
+            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+            sudo mv /tmp/docker/* /usr/bin
+      - run:
+          name: Install Docker Compose
+          command: |
+            set -x
+            curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            #sudo curl -L https://github.com/docker/compose/releases/download/1.11.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+            #sudo chmod +x /usr/local/bin/docker-compose   
+            
+      - run:
+          name: Start container and verify it's working
+          command: |
+            set -
+            ls -latr
+            ls -ltr
+            docker-compose build testing-suite
+            docker-compose up    
