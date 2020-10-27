@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
        
-    working_directory: '~/docker_psql'
+    working_directory: './docker_psql'
 
     docker:
       - image: circleci/elixir:1.7.3
