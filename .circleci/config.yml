@@ -37,5 +37,9 @@ jobs:
           name: Get directory inside folder
           command: |
             cd ./docker_psql
+      
+      - run:
+          name: Run postgres docker
+          command: |
             #sudo docker-compose up 
       
