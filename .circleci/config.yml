@@ -37,16 +37,13 @@ jobs:
           name: Get directory inside database folder
           command: |
             cd ./docker_psql
-      
-      - run:
-          name: Run postgres docker
-          command: |
             #sudo docker-compose up 
       
       - run:
           name: Get directory inside api folder
           command: |
-            ls
+            cp ./api 
+            #sudo docker-compose up 
       
       # - run:
       #     name: Run api docker
