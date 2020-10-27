@@ -34,7 +34,7 @@ jobs:
             #sudo chmod +x /usr/local/bin/docker-compose   
             
       - run:
-          name: Get directory inside folder
+          name: Get directory inside database folder
           command: |
             cd ./docker_psql
       
@@ -43,3 +43,12 @@ jobs:
           command: |
             #sudo docker-compose up 
       
+      - run:
+          name: Get directory inside api folder
+          command: |
+            cd ../api
+      
+      - run:
+          name: Run api docker
+          command: |
+            #sudo docker-compose up 
