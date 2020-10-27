@@ -74,11 +74,11 @@
       </div>
     </div>
 
-    <base-header type="gradient-primary" class="pb-6 pb-8 pt-5 pt-md-8">
+    <base-header type="gradient-primary" class="pb-6 pb-8 pt-md-4">
       <div class="row">
         <div class="col-12">
           <a
-            class="btn btn-lg btn-success text-white float-right mb-5"
+            class="btn btn-lg btn-success text-white float-right"
             data-toggle="modal"
             data-target="#createModal"
             >Create user</a
@@ -86,6 +86,9 @@
         </div>
       </div>
       <!-- Card stats -->
+      <div class="row d-flex justify-content-center mb-5">
+        <vue-qrcode value="https://0.0.0.0:4000/" />
+      </div>
       <div class="row">
         <div class="col-xl-4 col-lg-4">
           <stats-card
@@ -132,83 +135,83 @@
     <!--Charts-->
     <div class="container-fluid mt--7">
       <div class="row">
-        <div class="col-xl-6 mb-5 mb-xl-0">
+        <div class="col-xl-6 mb-5 mb-xl-0" v-if="this.charts.indexOf('line') != -1">
           <card type="default" header-classes="bg-transparent">
             <div slot="header" class="row align-items-center">
               <div class="col">
+                <div style="position:absolute; right: 20px; font-size: 30px" class='text-danger' @click="removeChart('line')"><i class="fas fa-times"></i></div>
                 <h6 class="text-light text-uppercase ls-1 mb-1">Overview</h6>
                 <h5 class="h3 text-white mb-0">Working time average</h5>
-              </div>
-              <div class="col">
-                <ul class="nav nav-pills justify-content-end">
-                  <li class="nav-item mr-2 mr-md-0">
-                    <a
-                      class="nav-link py-2 px-3"
-                      href="#"
-                      :class="{ active: bigLineChart.activeIndex === 0 }"
-                      @click.prevent="initBigChart(0)"
-                    >
-                      <span class="d-none d-md-block">Month</span>
-                      <span class="d-md-none">M</span>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a
-                      class="nav-link py-2 px-3"
-                      href="#"
-                      :class="{ active: bigLineChart.activeIndex === 1 }"
-                      @click.prevent="initBigChart(1)"
-                    >
-                      <span class="d-none d-md-block">Week</span>
-                      <span class="d-md-none">W</span>
-                    </a>
-                  </li>
-                </ul>
               </div>
             </div>
             <line-chart
               :height="350"
-              ref="bigChart"
-              :chart-data="bigLineChart.chartData"
-              :extra-options="bigLineChart.extraOptions"
             >
             </line-chart>
           </card>
         </div>
-
-        <div class="col-xl-3">
-          <card header-classes="bg-transparent">
+        <div class="col-xl-2 mb-5 mb-xl-0" v-else>
+          <card type="default" header-classes="bg-transparent">
             <div slot="header" class="row align-items-center">
               <div class="col">
-                <h6 class="text-uppercase text-muted ls-1 mb-1">Performance</h6>
-                <h5 class="h3 mb-0">Clocking times</h5>
+                <div style="position:absolute; right: 20px; font-size: 30px" class='text-success' @click="addChart('line')"><i class="fas fa-plus"></i></div>
+                <h6 class="text-light text-uppercase ls-1 mb-1">Overview</h6>
+                <h5 class="h5 text-white mb-0">Working time average</h5>
               </div>
             </div>
-
-            <bar-chart
-              :height="350"
-              ref="barChart"
-              :chart-data="redBarChart.chartData"
-            >
-            </bar-chart>
           </card>
         </div>
 
-        <div class="col-xl-3">
+
+        <div class="col-xl-3" v-if="this.charts.indexOf('donut') != -1">
           <card header-classes="bg-transparent">
             <div slot="header" class="row align-items-center">
               <div class="col">
+                <div style="position:absolute; right: 20px; font-size: 30px" class='text-danger' @click="removeChart('donut')"><i class="fas fa-times"></i></div>
                 <h6 class="text-uppercase text-muted ls-1 mb-1">Performance</h6>
-                <h5 class="h3 mb-0">Lateness average</h5>
+                <h5 class="h3 mb-0">Working times repartition</h5>
+              </div>
+            </div>
+            <donut-chart>
+            </donut-chart>
+          </card>
+        </div>
+        <div class="col-xl-3" v-else>
+          <card header-classes="bg-transparent">
+            <div slot="header" class="row align-items-center">
+              <div class="col">
+                <div style="position:absolute; right: 20px; font-size: 30px" class='text-success' @click="addChart('donut')"><i class="fas fa-plus"></i></div>
+                <h6 class="text-uppercase text-muted ls-1 mb-1">Performance</h6>
+                <h5 class="h5 mb-0">Working times repartition</h5>
+              </div>
+            </div>
+          </card>
+        </div>
+
+        <div class="col-xl-3" v-if="this.charts.indexOf('bar') != -1">
+          <card header-classes="bg-transparent">
+            <div slot="header" class="row align-items-center">
+              <div class="col">
+                <div style="position:absolute; right: 20px; font-size: 30px" class='text-danger' @click="removeChart('bar')"><i class="fas fa-times"></i></div>
+                <h6 class="text-uppercase text-muted ls-1 mb-1">Performance</h6>
+                <h5 class="h3 mb-0">Effectiv work time average</h5>
               </div>
             </div>
 
-            <bar-chart
-              :height="350"
-              ref="barChart"
-              :chart-data="redBarChart.chartData"
-            >
+            <bar-chart>
             </bar-chart>
+            
+          </card>
+        </div>
+        <div class="col-xl-3" v-else>
+          <card header-classes="bg-transparent">
+            <div slot="header" class="row align-items-center">
+              <div class="col">
+                <div style="position:absolute; right: 20px; font-size: 30px" class='text-success' @click="addChart('bar')"><i class="fas fa-plus"></i></div>
+                <h6 class="text-uppercase text-muted ls-1 mb-1">Performance</h6>
+                <h5 class="h5 mb-0">Effectiv work time average</h5>
+              </div>
+            </div>
           </card>
         </div>
       </div>
@@ -228,44 +231,26 @@
 import axios from "axios";
 
 // Charts
-import * as chartConfigs from "@/components/Charts/config";
+import {EventBus} from "../store/event-bus";
 import LineChart from "../components/Charts/LineChart.vue";
-import BarChart from "@/components/Charts/BarChart";
+import DonutChart from "@/components/Charts/DonutChart.vue";
+import BarChart from "@/components/Charts/BarChart.vue";
 
 // Tables
 import PageVisitsTable from "./Dashboard/PageVisitsTable";
+import VueQrcode from 'vue-qrcode'
+
 
 export default {
   components: {
+    VueQrcode,
     LineChart,
+    DonutChart,
     BarChart,
     PageVisitsTable,
   },
   data() {
     return {
-      bigLineChart: {
-        allData: [
-          [0, 20, 10, 30, 15, 40, 20, 60, 60],
-          [0, 20, 5, 25, 10, 30, 15, 40, 40],
-        ],
-        activeIndex: 0,
-        chartData: {
-          datasets: [],
-          labels: [],
-        },
-        extraOptions: chartConfigs.blueChartOptions,
-      },
-      redBarChart: {
-        chartData: {
-          labels: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-          datasets: [
-            {
-              label: "Sales",
-              data: [25, 20, 30, 22, 17, 29],
-            },
-          ],
-        },
-      },
       email: "",
       username: "",
       success: "",
@@ -275,23 +260,12 @@ export default {
       },
       totalUsers: "",
       workingTimesCount: "",
-      workingTimesAverage: 0
+      workingTimesAverage: 0,
+      workedTimeAverage: 0,
+      charts: ['line', 'bar', 'donut']
     };
   },
   methods: {
-    initBigChart(index) {
-      let chartData = {
-        datasets: [
-          {
-            label: "Performance",
-            data: this.bigLineChart.allData[index],
-          },
-        ],
-        labels: ["May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-      };
-      this.bigLineChart.chartData = chartData;
-      this.bigLineChart.activeIndex = index;
-    },
     createUser() {
       let form = new FormData();
 
@@ -299,14 +273,11 @@ export default {
       form.append("username", this.username);
 
       axios
-        .post("http://localhost:4000/api/users/", form)
-        .then(() => {
+        .post("http://3.127.5.177:4000/api/users/", form)
+        .then((response) => {
           this.clearErrorMessage();
           this.success = "User created";
-
-          setTimeout(() => {
-            window.location.reload();
-          }, 4000);
+          this.createChartManager(response.data.data.id);
         })
         .catch((error) => {
           this.clearErrorMessage();
@@ -315,16 +286,102 @@ export default {
           }
         });
     },
+    getUserChart() {
+      axios
+        .get("http://3.127.5.177:4000/api/charts/" + this.userID)
+        .then((response) => {
+          this.charts = [];
+          
+          if (response.data.data[0]['bar']) {
+            this.charts.push('bar')
+          }
+
+          if (response.data.data[0]['line']) {
+            this.charts.push('line')
+          }
+
+          if (response.data.data[0]['donut']) {
+            this.charts.push('donut')
+          }
+
+        })
+        .catch((error) => {
+          this.clearErrorMessage();
+          for (const key in error.response.data.errors) {
+            this.errors[key] = error.response.data.errors[key];
+          }
+        });
+    },
+    removeChart(name) {
+      let index = this.charts.indexOf(name);
+      this.charts.splice(index, 1);
+
+      let charts = this.getAvailableCharts();
+
+      axios.put("http://3.127.5.177:4000/api/charts/" + String(this.userID), charts)
+      .then((response) => {
+        console.log(response);
+        this.getUserChart();
+      })
+
+      
+    },
+    getAvailableCharts () {
+      let form = new FormData();
+      if (this.charts.indexOf('donut')) {
+        form.append('donut', 'true');
+      } else {
+        form.append('line', 'false');
+      }
+
+      if (this.charts.indexOf('line')) {
+        form.append('line', 'true');
+      } else {
+        form.append('line', 'false');
+      }
+
+      if (this.charts.indexOf('bar')) {
+        form.append('bar', 'true');
+      } else {
+        form.append('bar', 'false');
+      }
+      return form
+    },
+
+    addChart(name) {
+      this.charts.push(name);
+      let charts = this.getAvailableCharts();
+
+      console.log(charts.getAll());
+
+      axios.put("http://3.127.5.177:4000/api/charts/" + String(this.userID), charts)
+      .then((response) => {
+        console.log(response);
+        this.getUserChart();
+      })
+    },
+    createChartManager (userId) {
+      let form = new FormData()
+      form.append('donut', 'true');
+      form.append('line', 'true');
+      form.append('bar', 'true');
+      form.append('userID', userId);
+
+      axios.post("http://3.127.5.177:4000/api/charts", form)
+      .then((response) => {
+        console.log(response);
+      })
+    },
     getAllUsers () {
         axios
-        .get("http://localhost:4000/api/users/all")
+        .get("http://3.127.5.177:4000/api/users/all")
         .then((response) => {
           this.totalUsers = response.data.length;
         })
     },
     getWorkingTimesAverage () {
         axios
-        .get("http://localhost:4000/api/workingtimes/all")
+        .get("http://3.127.5.177:4000/api/workingtimes/all")
         .then((response) => {
           let workingTimesCount = response.data.length;
           let totalHour = 0;
@@ -341,7 +398,7 @@ export default {
           });
 
           this.workingTimesAverage = totalHour/workingTimesCount
-        })
+        });
     },
     computeWorkedTimeAverage(days) {
       let start = "";
@@ -357,6 +414,7 @@ export default {
           end = Date.parse(end);
           clockCount += 1;
           workedTime += new Date(Math.abs(start - end)).getMinutes();
+          workedTime += new Date(Math.abs(start - end)).getHours() * 60;
         }
       });
 
@@ -365,9 +423,8 @@ export default {
     },
     getWorkedTimesAverage () {
         axios
-        .get("http://localhost:4000/api/clocks/all")
+        .get("http://3.127.5.177:4000/api/clocks/all")
         .then((response) => {
-          console.log(response.data);
           this.computeWorkedTimeAverage(response.data)
         })
     },
@@ -379,7 +436,10 @@ export default {
     },
   },
   mounted() {
-    this.initBigChart(0);
+    EventBus.$on('userID', (userID) => {
+      this.userID = userID;
+      this.getUserChart();
+    });
     this.getAllUsers();
     this.getWorkingTimesAverage();
     this.getWorkedTimesAverage();
