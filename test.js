@@ -57,18 +57,18 @@ async function test_user() {
   await axios(userConfigPost)
   .then(function (response) {
     if (JSON.stringify(response.data) != JSON.stringify(userResPost)) {
-      console.log("ERROR")
-      console.log("GOT :")
-      console.log(JSON.stringify(response.data));
-      console.log("BUT EXPECTED :");
-      console.log(JSON.stringify(userResPost));
+      throw "results differ: " + JSON.stringify(response.data)
     }else {
       console.log("TEST OK")
       console.log("GOT : \n" + JSON.stringify(response.data))
     }
   })
   .catch(function (error) {
-    console.log("ERROR\nGOT:\n" + JSON.stringify(error.response.data.errors))
+    if (error.response) {
+      throw error.response.data.errors;
+    } else {
+      throw "user creation error:\n" + error
+    }
   });
 
   console.log("\n------ TESTING GET ------")
@@ -76,19 +76,18 @@ async function test_user() {
   await axios(userConfigGet)
   .then(function (response) {
     if (JSON.stringify(response.data) != JSON.stringify(userResGet)) {
-      console.log("ERROR")
-      console.log("GOT :")
-      console.log(JSON.stringify(response.data));
-      console.log("BUT EXPECTED :");
-      console.log(JSON.stringify(userResGet));
+      throw "results differ: " + JSON.stringify(response.data);
     } else {
       console.log("TEST OK")
       console.log("GOT : \n" + JSON.stringify(response.data))
     }
   })
   .catch(function (error) {
-    if (error.response.data.error === "{'credentials': ['user not found']}" ) {console.log("ERROR \nNO USER WAS FOUND")}
-    else {console.log(error)}
+    if (error.response) {
+      throw error.response.data.errors;
+    } else {
+      throw "user listing error:\n" + error
+    }
   });
 
   console.log("\n------ TESTING UPDATE ------")
@@ -96,15 +95,17 @@ async function test_user() {
   await axios(userConfigPut)
   .then(function (response) {
     if (response && (JSON.stringify(response.data) != JSON.stringify(userResPut))) {
-      console.log("ERROR\nGOT:\n" + JSON.stringify(response.data));
-      console.log("BUT EXPECTED:\n" + JSON.stringify(userResPut))
+      throw "results differ: " + JSON.stringify(response.data)
     } else {
       console.log("TEST OK\nGOT:\n" + JSON.stringify(response.data))
     }
   })
   .catch(function (error) {
-    if (error.response && error.response.data.errors === "{'credentials': ['user not found']}") { console.log("ERROR\nNO USER WAS FOUND")}
-    else {console.log(error)}
+    if (error.response) {
+      throw error.response.data.errors;
+    } else {
+      throw "user update error:\n" + error
+    }
   })
 
   console.log("\n------ TESTING DELETE ------")
@@ -112,15 +113,17 @@ async function test_user() {
   await axios(userConfigDel)
   .then(function (response) {
     if (response && (JSON.stringify(response.data) != JSON.stringify(userResDel))) {
-      console.log("ERROR\nGOT:\n" + JSON.stringify(response.data));
-      console.log("BUT EXPECTED:\n" + JSON.stringify(userResDel))
+      throw "results differ: " + JSON.stringify(response.data)
     } else {
       console.log("TEST OK\nGOT:\n" + JSON.stringify(response.data))
     }
   })
   .catch(function (error) {
-    if (error.response && error.response.data.errors === "{'credentials': ['user not found']}") { console.log("ERROR\nNO USER WAS FOUND")}
-    else {console.log(error)}
+    if (error.response) {
+      throw error.response.data.errors;
+    } else {
+      throw "user delete error:\n" + error
+    }
   })
   console.log("\n------- USER UNIT TEST OK -------\n\n")
 }
@@ -134,7 +137,7 @@ async function test_working_times() {
   const userResPost = {
     data: {
       email: "test@test.com",
-      id:1,
+      id:2,
       is_active:false,
       username:"test"
     }
@@ -142,7 +145,7 @@ async function test_working_times() {
 
   const wtConfigPost = {
     method: "post",
-    url: "http://localhost:4000/api/workingtimes/1?start=2000-01-01 23:00:07&end=2000-01-02 23:00:07", 
+    url: "http://localhost:4000/api/workingtimes/2?start=2000-01-01 23:00:07&end=2000-01-02 23:00:07", 
     headers: { }
   }
   const wtResPost = {
@@ -151,69 +154,140 @@ async function test_working_times() {
 
   const wtConfigGet = {
     method: "get",
-    url: "http://localhost:4000/api/workingtimes/1",
+    url: "http://localhost:4000/api/workingtimes/2",
     headers: { }
   }
   const wtResGet = {
-    data: {
-      start : "2000-01-01 23:00:07",
-      end : "2000-01-02 23:00:07",
-      id: "1",
-      user: "1"
-    }
+    data: [{
+      end : "2000-01-02T23:00:07",
+      id: 1,
+      start : "2000-01-01T23:00:07",
+      user: "2"
+    }]
+  }
+
+  const wtConfigPut = {
+    method: "put",
+    url: "http://localhost:4000/api/workingtimes/1?start=2001-02-02 23:00:07&end=2001-02-02 23:00:07",
+    headers: { },
+  }
+  const wtResPut = {
+    Response: "Updated",
+    end: "2001-02-02 23:00:07",
+    id: '1',
+    start: "2001-02-02 23:00:07",
+  }
+
+  const wtConfigDel = {
+    method: "delete",
+    url: "http://localhost:4000/api/workingtimes/1",
+    headers: { }
+  }
+  const wtResDel = {
+    response: "Deleted"
   }
 
   await axios(userConfigPost)
   .then(function (response) {
     if (JSON.stringify(response.data) != JSON.stringify(userResPost)) {
-      console.log("ERROR")
-      console.log("GOT :")
-      console.log(JSON.stringify(response.data));
-      console.log("BUT EXPECTED :");
-      console.log(JSON.stringify(userResPost));
+      throw "results differ: " + JSON.stringify(response.data)
     }else {
       console.log("USER CREATED")
       console.log("GOT : \n" + JSON.stringify(response.data))
     }
   })
   .catch(function (error) {
-    console.log("ERROR\nGOT:\n" + JSON.stringify(error.response.data.errors))
+    if (error.response) {
+      throw error.response.data.errors;
+    } else {
+      throw "user create error:\n" + error
+    }
   });
 
   console.log("\n\n------- WORKING TIMES UNIT TESTS -------\n\n")
   console.log("------ CREATING WT ------")
+  console.log("TRYING TO CREATE WT")
   await axios(wtConfigPost)
   .then(function (response) {
     if (response && (JSON.stringify(response.data) != JSON.stringify(wtResPost))) {
-      console.log("ERROR\nGOT:\n" + JSON.stringify(response.data));
-      console.log("BUT EXPECTED:\n" + JSON.stringify(wtResPost))
+      throw "results differ: " + JSON.stringify(response.data)
     } else {
       console.log("TEST OK\nGOT:\n" + JSON.stringify(response.data))
     }
   })
   .catch(function (error) {
-    if (error.response && error.response.data.errors === "{'credentials': ['user not found']}") { console.log("ERROR\nNO USER WAS FOUND")}
-    else {console.log(error)}
+    if (error.response) {
+      throw error.response.data.errors;
+    } else {
+      throw "wt create error:\n" + error
+    }
   })
   console.log("------ GETTING WT ------")
+  console.log("TRYING TO LIST WT")
   await axios(wtConfigGet)
   .then(function (response) {
     if (JSON.stringify(response.data) != JSON.stringify(wtResGet)) {
-      console.log("ERROR")
-      console.log("GOT :")
-      console.log(JSON.stringify(response.data));
-      console.log("BUT EXPECTED :");
-      console.log(JSON.stringify(wtResGet));
+      throw "results differ: " + JSON.stringify(response.data)
     }else {
-      console.log("USER CREATED")
+      console.log("TEST OK")
       console.log("GOT : \n" + JSON.stringify(response.data))
     }
   })
   .catch(function (error) {
-    console.log("ERROR\nGOT:\n" + JSON.stringify(error.response.data.errors))
+    if (error.response) {
+      throw error.response.data.errors;
+    } else {
+      throw "wt read error:\n" + error
+    }
   });
+  console.log("------ UPDATING WT ------")
+  console.log("TRYING TO UPDATE WT")
+  await axios(wtConfigPut)
+  .then(function (response) {
+    if (JSON.stringify(response.data) != JSON.stringify(wtResPut)) {
+      throw "results differ: " + JSON.stringify(response.data)
+    } else {
+      console.log("WT UPDATED");
+      console.log("GOT: \n" + JSON.stringify(response.data))
+    }
+  })
+  .catch(function (error) {
+    if (error.response) {
+      throw error.response.data.errors;
+    } else {
+      throw "wt update error:\n" + error
+    }
+  })
+  console.log("------ DELETING WT ------")
+  console.log("TRYING TO DELETE WT")
+  await axios(wtConfigDel)
+  .then(function (response) {
+    if (JSON.stringify(response.data) != JSON.stringify(wtResDel))
+      throw "results differ: " + JSON.stringify(response.data)
+    else {
+      console.log("WT DELETED");
+      console.log("GOT:\n" + JSON.stringify(response.data))
+    }
+  })
+  .catch(function (error) {
+    if (error.response)
+      throw error.response.data.errors;
+    else
+      throw "wt delete error:\n" + error
+  })
   console.log("\n------- WORKING TIMES UNIT TEST OK -------\n\n")
 }
 
-test_user()
-test_working_times()
+async function run_test() {
+  console.log("--------------------- STARTING TESTS ---------------------")
+  try {
+    await test_user();
+    await test_working_times();
+    console.log("--------------------- TESTS ENDED SUCCESSFULLY ---------------------")
+  } catch (e) {
+    console.log(e)
+    console.log("--------------------- TESTS ENDED WITH ERROR ---------------------")
+  }
+}
+
+run_test();
