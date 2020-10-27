@@ -36,4 +36,9 @@ jobs:
       - run:
           name: Get directory inside folder
           command: |
-            cd ./docker_psql  && ls
+            cd ./docker_psql
+      
+      - run:
+          name: Run postgres sql
+          command: |
+           docker-compose up
