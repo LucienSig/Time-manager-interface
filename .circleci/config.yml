@@ -34,6 +34,6 @@ jobs:
             #sudo chmod +x /usr/local/bin/docker-compose   
             
       - run:
-          name: Start container and verify it's working
+          name: Get directory inside folder
           command: |
-            cd ./docker_psql  
+            cd ./docker_psql  && ls
