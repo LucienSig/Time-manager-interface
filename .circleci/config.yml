@@ -24,9 +24,18 @@ jobs:
             curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
             tar -xz -C /tmp -f /tmp/docker-$VER.tgz
             sudo mv /tmp/docker/* /usr/bin
+
+      - run:
+          name: Install Docker Compose
+          command: |
             set -x
             curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
             #sudo curl -L https://github.com/docker/compose/releases/download/1.11.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
-            #sudo chmod +x /usr/local/bin/docker-compose 
-            cd ./docker_psql && ls && docker-compose up 
+            #sudo chmod +x /usr/local/bin/docker-compose   
+            
+      - run:
+          name: Get directory inside folder
+          command: |
+            cd ./docker_psql
+            #sudo docker-compose up 
       
