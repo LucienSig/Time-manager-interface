@@ -3,5 +3,6 @@ version: 2.1
 
 jobs: 
   steps:
+    checkout
     run: cd ../docker_psql/ && docker-compuse up -d
     run: cd api/ && docker-compuse up -d
