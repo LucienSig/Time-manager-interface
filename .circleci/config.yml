@@ -28,7 +28,7 @@ jobs:
             curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
             tar -xz -C /tmp -f /tmp/docker-$VER.tgz
             sudo mv /tmp/docker/* /usr/bin
-            
+
       - run:
           name: Install Docker Compose
           command: |
@@ -40,8 +40,4 @@ jobs:
       - run:
           name: Start container and verify it's working
           command: |
-            set -
-            ls -latr
-            ls -ltr
-            docker-compose build testing-suite
             docker-compose up    
