@@ -155,9 +155,9 @@ async function test_working_times() {
     headers: { }
   }
   const wtResGet = {
-    data = {
-      start = "2000-01-01 23:00:07",
-      end = "2000-01-02 23:00:07",
+    data: {
+      start : "2000-01-01 23:00:07",
+      end : "2000-01-02 23:00:07",
       id: "1",
       user: "1"
     }
