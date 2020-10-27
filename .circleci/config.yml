@@ -46,7 +46,7 @@ jobs:
       - run:
           name: Get directory inside api folder
           command: |
-            cd ../ && ls
+            ls
       
       # - run:
       #     name: Run api docker
