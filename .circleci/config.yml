@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
        
-    working_directory: './docker_psql'
+    working_directory: '~/docker_psql'
 
     docker:
       - image: circleci/elixir:1.7.3
@@ -16,8 +16,6 @@ jobs:
 
     steps:
       - checkout
-      - run: 'pwd'
-      - run: 'ls'
 
       # This should go into custom primary image, here's only for the sake of explanation
       - run:
