@@ -1,10 +1,11 @@
 use Mix.Config
 
 # Configure your database
-database_url = System.get_env("DATABASE_URL")
-# Configure your database
 config :api, Api.Repo,
-  url: database_url,
+  username: "postgres",
+  password: "a",
+  database: "api_dev",
+  hostname: "localhost",
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
