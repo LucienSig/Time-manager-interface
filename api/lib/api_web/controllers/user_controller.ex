@@ -19,13 +19,14 @@ defmodule ApiWeb.UserController do
       |> json(%{
         "email": user.email,
         "username": user.username,
+        "role": user.role,
         "id": user.id
       })
     end
   end
 
-  def create(conn, %{"email" => email, "username" => username, "password" => passwd, "role" => role, "team" => team}) do
-    with {:ok, %User{} = user} <- Accounts.create_user(%{"email" => email, "username" => username, "password" => passwd, "team" => team, "role" => role}) do
+  def create(conn, params) do
+    with {:ok, %User{} = user} <- Accounts.create_user(params) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.user_path(conn, :show, user))
