@@ -26,8 +26,6 @@ defmodule ApiWeb.LoginController do
       |>Base.encode16()
       |> String.downcase()
       if user.password == password do
-        #Return JWT with userID + role + c-xsrf-token + 30 day expiry
-        #get_csrf_token() for token
         if System.get_env("token") == nil do
           token = get_csrf_token()
           System.put_env("token", token)
@@ -42,12 +40,12 @@ defmodule ApiWeb.LoginController do
       else
         conn
         |> put_status(404)
-        |> json(%{"errors" => "{'credentials': ['user not found']}"})
+        |> json(%{"errors" => "{'credentials': ['wrong email/password']}"})
       end
     else
       conn
       |> put_status(404)
-      |> json(%{"errors" => "{'credentials': ['user not found']}"})
+      |> json(%{"errors" => "{'credentials': ['wrong email/password']}"})
     end
   end
 end
