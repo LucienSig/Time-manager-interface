@@ -24,8 +24,8 @@ defmodule ApiWeb.UserController do
     end
   end
 
-  def create(conn, %{"email" => email, "username" => username}) do
-    with {:ok, %User{} = user} <- Accounts.create_user(%{"email" => email, "username" => username}) do
+  def create(conn, %{"email" => email, "username" => username, "password" => passwd, "role" => role, "team" => team}) do
+    with {:ok, %User{} = user} <- Accounts.create_user(%{"email" => email, "username" => username, "password" => passwd, "team" => team, "role" => role}) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.user_path(conn, :show, user))
@@ -44,7 +44,7 @@ defmodule ApiWeb.UserController do
       render(conn, "show.json", user: user)
     else
       user = Repo.all(User)
-      |> Enum.map(&%{email: &1.email, username: &1.username, id: &1.id})
+      |> Enum.map(&%{email: &1.email, username: &1.username, id: &1.id, password: &1.password, role: &1.role, team: &1.team})
       if user == [] do
         conn
         |> put_status(404)
@@ -57,11 +57,11 @@ defmodule ApiWeb.UserController do
     end
   end
 
-  def update(conn, %{"userID" => id, "email" => email, "username" => username}) do
-    user = Repo.get(User, id)
+  def update(conn, params) do
+    user = Repo.get(User, params["userID"])
 
     if user do
-      with {:ok, %User{} = user} <- Accounts.update_user(user, %{"email" => email, "username" => username}) do
+      with {:ok, %User{} = user} <- Accounts.update_user(user, params) do
         render(conn, "show.json", user: user)
       end
     else

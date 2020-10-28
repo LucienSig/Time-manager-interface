@@ -82,15 +82,15 @@ defmodule ApiWeb.WorkingTimeController do
 
   end
 
-  def change(conn, %{"id" => working_time_id, "start" => start, "end" => finish}) do
-    workingtime = Repo.get(WorkingTime, working_time_id)
+  def change(conn, params) do
+    workingtime = Repo.get(WorkingTime, params["id"])
     if workingtime do
-      changeset = WorkingTime.changeset(workingtime, %{"start" => start, "end" => finish, "id" => working_time_id})
+      changeset = WorkingTime.changeset(workingtime, params)
       case Repo.update(changeset) do
         {:ok, workingtime} ->
           conn
           |> put_status(200)
-          |>json(%{"Response" => "Updated", "start" => start, "end" => finish, "id" => working_time_id})
+          |>json(%{"Response" => "Updated", "start" => params["start"], "end" => params["end"], "id" => params["id"]})
         {:error, result} ->
           conn
           |> put_status(404)
