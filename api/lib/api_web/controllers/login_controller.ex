@@ -16,10 +16,17 @@ defmodule ApiWeb.LoginController do
 
     user = Repo.one(query)
     if user do
-      if user.password == params["password"] do
+      password = :crypto.hash(:sha256, params["password"])
+      |>Base.encode16()
+      |> String.downcase()
+      if user.password == password do
         conn
         |> put_status(200)
         |> json(%{"success" => "connected"})
+      else
+        conn
+        |> put_status(404)
+        |> json(%{"errors" => "{'credentials': ['user not found']}"})
       end
     else
       conn

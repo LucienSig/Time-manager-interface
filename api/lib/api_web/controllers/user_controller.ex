@@ -25,8 +25,11 @@ defmodule ApiWeb.UserController do
     end
   end
 
-  def create(conn, params) do
-    with {:ok, %User{} = user} <- Accounts.create_user(params) do
+  def create(conn, %{"email" => email, "username" => username, "password" => passwd, "role" => role, "team" => team}) do
+    password = :crypto.hash(:sha256, passwd)
+    |>Base.encode16()
+    |> String.downcase()
+    with {:ok, %User{} = user} <- Accounts.create_user( %{"email" => email, "username" => username, "password" => password, "role" => role, "team" => team}) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.user_path(conn, :show, user))
