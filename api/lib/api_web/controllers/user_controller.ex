@@ -65,8 +65,20 @@ defmodule ApiWeb.UserController do
     user = Repo.get(User, params["userID"])
 
     if user do
-      with {:ok, %User{} = user} <- Accounts.update_user(user, params) do
-        render(conn, "show.json", user: user)
+      if params["password"] do
+        Accounts.update_user(user, params)
+        password = :crypto.hash(:sha256, params["password"])
+        |> Base.encode16()
+        |> String.downcase()
+        with {:ok, %User{} = user} <- Accounts.update_user(user, %{"password" => password}) do
+          conn
+          |> put_status(200)
+          |> json(%{"Success" => "Updated Password"})
+        end
+      else
+        with {:ok, %User{} = user} <- Accounts.update_user(user, params) do
+          render(conn, "show.json", user: user)
+        end
       end
     else
       conn
