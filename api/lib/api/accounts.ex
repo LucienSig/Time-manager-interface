@@ -136,4 +136,100 @@ defmodule Api.Accounts do
 
   """
 
+
+  alias Api.Accounts.Login
+
+  @doc """
+  Returns the list of login.
+
+  ## Examples
+
+      iex> list_login()
+      [%Login{}, ...]
+
+  """
+  def list_login do
+    Repo.all(Login)
+  end
+
+  @doc """
+  Gets a single login.
+
+  Raises `Ecto.NoResultsError` if the Login does not exist.
+
+  ## Examples
+
+      iex> get_login!(123)
+      %Login{}
+
+      iex> get_login!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_login!(id), do: Repo.get!(Login, id)
+
+  @doc """
+  Creates a login.
+
+  ## Examples
+
+      iex> create_login(%{field: value})
+      {:ok, %Login{}}
+
+      iex> create_login(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_login(attrs \\ %{}) do
+    %Login{}
+    |> Login.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a login.
+
+  ## Examples
+
+      iex> update_login(login, %{field: new_value})
+      {:ok, %Login{}}
+
+      iex> update_login(login, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_login(%Login{} = login, attrs) do
+    login
+    |> Login.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a login.
+
+  ## Examples
+
+      iex> delete_login(login)
+      {:ok, %Login{}}
+
+      iex> delete_login(login)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_login(%Login{} = login) do
+    Repo.delete(login)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking login changes.
+
+  ## Examples
+
+      iex> change_login(login)
+      %Ecto.Changeset{data: %Login{}}
+
+  """
+  def change_login(%Login{} = login, attrs \\ %{}) do
+    Login.changeset(login, attrs)
+  end
 end

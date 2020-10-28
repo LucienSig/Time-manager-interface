@@ -32,6 +32,9 @@ defmodule ApiWeb.Router do
     get "/charts/:userID/:chartID", ChartController, :show
     post "/charts", ChartController, :create
     put "/charts/:userID", ChartController, :change
+
+    # Login
+    post "/login", LoginController, :login
   end
 
   # Other scopes may use custom stacks.
