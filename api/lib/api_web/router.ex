@@ -35,6 +35,7 @@ defmodule ApiWeb.Router do
 
     # Login
     post "/login", LoginController, :login
+    post "/logout", LoginController, :logout
   end
 
   # Other scopes may use custom stacks.
