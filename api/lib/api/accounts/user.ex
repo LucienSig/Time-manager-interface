@@ -22,6 +22,5 @@ defmodule Api.Accounts.User do
     |> validate_format(:email, @mail_regex)
     |> unique_constraint(:email)
     |> unique_constraint(:username)
-    |> put_password_hash
   end
 end
