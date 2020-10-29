@@ -25,15 +25,21 @@ defmodule ApiWeb.UserController do
     end
   end
 
-  def create(conn, %{"email" => email, "username" => username, "password" => passwd, "role" => role, "team" => team}) do
-    password = :crypto.hash(:sha256, passwd)
-    |>Base.encode16()
-    |> String.downcase()
-    with {:ok, %User{} = user} <- Accounts.create_user( %{"email" => email, "username" => username, "password" => password, "role" => role, "team" => team}) do
+  def create(conn, params) do
+    if params["email"] != nil and params["username"] != nil and params["password"] != nil and params["role"] != nil and params["team"] != nil do
+      password = :crypto.hash(:sha256, params["password"])
+      |>Base.encode16()
+      |> String.downcase()
+      with {:ok, %User{} = user} <- Accounts.create_user( %{"email" => params["email"], "username" => params["username"], "password" => password, "role" => params["role"], "team" => params["team"]}) do
+        conn
+        |> put_status(:created)
+        |> put_resp_header("location", Routes.user_path(conn, :show, user))
+        |> render("show.json", user: user)
+      end
+    else
       conn
-      |> put_status(:created)
-      |> put_resp_header("location", Routes.user_path(conn, :show, user))
-      |> render("show.json", user: user)
+      |> put_status(401)
+      |> json(%{"error" => "{'params': ['missing parameter']}"})
     end
   end
 

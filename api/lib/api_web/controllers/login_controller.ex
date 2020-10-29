@@ -22,26 +22,32 @@ defmodule ApiWeb.LoginController do
   end
 
   def login(conn, params) do
-    where = [email: params["email"]]
-    select = [:email, :password, :id, :role]
-    query = from User, where: ^where, select: ^select
+    if params["email"] != nil and params["password"] != nil do
+      where = [email: params["email"]]
+      select = [:email, :password, :id, :role]
+      query = from User, where: ^where, select: ^select
 
-    user = Repo.one(query)
-    if user do
-      password = :crypto.hash(:sha256, params["password"])
-      |>Base.encode16()
-      |> String.downcase()
-      if user.password == password do
-        if System.get_env("token") == nil do
-          token = get_csrf_token()
-          System.put_env("token", token)
-          conn
-          |> put_status(200)
-          |> json(%{"token" => token, "user" => user.id, "role" => user.role})
+      user = Repo.one(query)
+      if user do
+        password = :crypto.hash(:sha256, params["password"])
+        |>Base.encode16()
+        |> String.downcase()
+        if user.password == password do
+          if System.get_env("token") == nil do
+            token = get_csrf_token()
+            System.put_env("token", token)
+            conn
+            |> put_status(200)
+            |> json(%{"token" => token, "user" => user.id, "role" => user.role})
+          else
+            conn
+            |> put_status(200)
+            |> json(%{"token" => System.get_env("token"), "user" => user.id, "role" => user.role})
+          end
         else
           conn
-          |> put_status(200)
-          |> json(%{"token" => System.get_env("token"), "user" => user.id, "role" => user.role})
+          |> put_status(404)
+          |> json(%{"errors" => "{'credentials': ['wrong email/password']}"})
         end
       else
         conn
@@ -50,8 +56,8 @@ defmodule ApiWeb.LoginController do
       end
     else
       conn
-      |> put_status(404)
-      |> json(%{"errors" => "{'credentials': ['wrong email/password']}"})
+      |> put_status(401)
+      |> json(%{"errors" => "{'params': ['missing parameter']}"})
     end
   end
 end

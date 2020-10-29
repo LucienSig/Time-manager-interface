@@ -47,26 +47,32 @@ defmodule ApiWeb.ChartController do
     # end
   end
 
-  def create(conn, %{"userID" => id, "line" => line, "bar" => bar, "donut" => donut}) do
-    user = Repo.get(User, id)
+  def create(conn, params) do
+    if params["userID"] != nil and params["line"] != nil and params["bar"] != nil and params["donut"] != nil do
+      user = Repo.get(User, params["userID"])
 
-    if user do
-      changeset =
-        Chart.changeset(%Chart{}, %{"line" => line, "bar" => bar, "donut" => donut, "user_id" => id})
+      if user do
+        changeset =
+          Chart.changeset(%Chart{}, %{"line" => params["line"], "bar" => params["bar"], "donut" => params["donut"], "user_id" => params["userID"]})
 
-      case Repo.insert(changeset) do
-        {:ok, _workingtimes} ->
-          json(conn |> put_status(:created), %{success: "Created"})
+        case Repo.insert(changeset) do
+          {:ok, _workingtimes} ->
+            json(conn |> put_status(:created), %{success: "Created"})
 
-        {:error, changeset} ->
-          errors = "#{inspect(changeset.errors)}" |> String.replace("[", "(") |> String.replace("]", ")") |> String.replace("{", "[") |> String.replace("}", "]") |> String.replace("(", "{") |> String.replace(")", "}") |> String.replace(" :", " ")
+          {:error, changeset} ->
+            errors = "#{inspect(changeset.errors)}" |> String.replace("[", "(") |> String.replace("]", ")") |> String.replace("{", "[") |> String.replace("}", "]") |> String.replace("(", "{") |> String.replace(")", "}") |> String.replace(" :", " ")
 
-          json(conn |> put_status(:bad_request), %{errors: errors})
+            json(conn |> put_status(:bad_request), %{errors: errors})
+        end
+      else
+        conn
+        |> put_status(404)
+        |> json(%{"errors" => "{'credentials': ['user not found']}"})
       end
     else
       conn
-      |> put_status(404)
-      |> json(%{"errors" => "{'credentials': ['user not found']}"})
+      |> put_status(400)
+      |> json(%{"errors" => "{'params': ['missing parameter']}"})
     end
   end
 

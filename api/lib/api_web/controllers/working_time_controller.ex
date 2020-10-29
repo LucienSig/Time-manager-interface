@@ -47,13 +47,14 @@ defmodule ApiWeb.WorkingTimeController do
     # end
   end
 
-  def create(conn, %{"userID" => id, "start" => start, "end" => finish}) do
+  def create(conn, params) do
     # if System.get_env("token") != nil do
-      user = Repo.get(User, id)
+    if params["userID"] != nil and params["start"] != nil and params["end"] != nil do
+      user = Repo.get(User, params["userID"])
 
       if user do
         changeset =
-          WorkingTime.changeset(%WorkingTime{}, %{"start" => start, "end" => finish, "user" => id})
+          WorkingTime.changeset(%WorkingTime{}, %{"start" => params["start"], "end" => params["end"], "user" => params["userID"]})
 
         case Repo.insert(changeset) do
           {:ok, _workingtimes} ->
@@ -69,6 +70,11 @@ defmodule ApiWeb.WorkingTimeController do
         |> put_status(404)
         |> json(%{"errors" => "{'credentials': ['user not found']}"})
       end
+    else
+      conn
+      |> put_status(401)
+      |> json(%{"errors" => "{'params': ['missing parameter']}"})
+    end
     # else
     #   conn
     #   |> put_status(404)
