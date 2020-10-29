@@ -15,6 +15,8 @@ defmodule ApiWeb.Router do
     get "/users/:userID", UserController, :show
     put "/users/:userID", UserController, :update
     delete "/users/:userID", UserController, :delete
+    post "/login", LoginController, :login
+    post "/logout", LoginController, :logout
 
     # Worktimes
     get "/workingtimes/:userID", WorkingTimeController, :index
@@ -32,22 +34,5 @@ defmodule ApiWeb.Router do
     get "/charts/:userID/:chartID", ChartController, :show
     post "/charts", ChartController, :create
     put "/charts/:userID", ChartController, :change
-
-    # Login
-    post "/login", LoginController, :login
-    post "/logout", LoginController, :logout
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", ApiWeb do
-  #   pipe_through :api
-  # end
-
-  # Enables LiveDashboard only for development
-  #
-  # If you want to use the LiveDashboard in production, you should put
-  # it behind authentication and allow only admins to access it.
-  # If your application does not have an admins-only section yet,
-  # you can use Plug.BasicAuth to set up some basic authentication
-  # as long as you are also using SSL (which you should anyway).
 end

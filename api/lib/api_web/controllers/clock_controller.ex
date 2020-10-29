@@ -10,7 +10,7 @@ defmodule ApiWeb.ClockController do
   action_fallback ApiWeb.FallbackController
 
   def read(conn, %{"userID" => userID}) do
-    if System.get_env("token") != nil do
+    # if System.get_env("token") != nil do
       if userID != "all" do
         where = [id: userID]
         select = [:id]
@@ -45,15 +45,15 @@ defmodule ApiWeb.ClockController do
         |>put_status(200)
         |> json(clock)
       end
-    else
-      conn
-      |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
-    end
+    # else
+    #   conn
+    #   |> put_status(404)
+    #   |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
+    # end
   end
 
   def create(conn, %{"userID" => userID}) do
-    if System.get_env("token") != nil do
+    # if System.get_env("token") != nil do
       count = Repo.all(from u in "clocks", select: fragment("count(*)"))
       id = List.first(count)
       user_tmp = Repo.get_by(User, [id: userID])
@@ -86,11 +86,11 @@ defmodule ApiWeb.ClockController do
         |> put_status(404)
         |> json(%{"errors" => "{'credentials': ['no user found']}"})
       end
-    else
-      conn
-      |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
-    end
+    # else
+    #   conn
+    #   |> put_status(404)
+    #   |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
+    # end
   end
 
   def show(conn, %{"id" => id}) do

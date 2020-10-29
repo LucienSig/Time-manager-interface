@@ -10,7 +10,7 @@ defmodule ApiWeb.WorkingTimeController do
   action_fallback ApiWeb.FallbackController
 
   def index(conn, %{"userID" => id}) do
-    if System.get_env("token") != nil do
+    # if System.get_env("token") != nil do
       if id != "all" do
         where = [id: id]
         select = [:id]
@@ -40,15 +40,15 @@ defmodule ApiWeb.WorkingTimeController do
         |>put_status(200)
         |> json(clock)
       end
-    else
-      conn
-      |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
-    end
+    # else
+    #   conn
+    #   |> put_status(404)
+    #   |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
+    # end
   end
 
   def create(conn, %{"userID" => id, "start" => start, "end" => finish}) do
-    if System.get_env("token") != nil do
+    # if System.get_env("token") != nil do
       user = Repo.get(User, id)
 
       if user do
@@ -69,15 +69,15 @@ defmodule ApiWeb.WorkingTimeController do
         |> put_status(404)
         |> json(%{"errors" => "{'credentials': ['user not found']}"})
       end
-    else
-      conn
-      |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
-    end
+    # else
+    #   conn
+    #   |> put_status(404)
+    #   |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
+    # end
   end
 
   def show(conn, %{"userID" => id, "workingtimeID" => working_time_id}) do
-    if System.get_env("token") != nil do
+    # if System.get_env("token") != nil do
       where = [user: id, id: working_time_id]
       select = [:start, :end, :id, :user]
       query = from WorkingTime, where: ^where, select: ^select
@@ -92,15 +92,15 @@ defmodule ApiWeb.WorkingTimeController do
         working_time = Time.get_working_time!(%{"userID" => id, "workingtimeID" => working_time_id})
         render(conn, "show.json", working_time: working_time)
       end
-    else
-      conn
-      |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
-    end
+    # else
+    #   conn
+    #   |> put_status(404)
+    #   |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
+    # end
   end
 
   def change(conn, params) do
-    if System.get_env("token") != nil do
+    # if System.get_env("token") != nil do
       workingtime = Repo.get(WorkingTime, params["id"])
       if workingtime do
         changeset = WorkingTime.changeset(workingtime, params)
@@ -115,15 +115,15 @@ defmodule ApiWeb.WorkingTimeController do
             |> json(%{"errors" => "{'credentials': ['workingtime not found']}"})
         end
       end
-    else
-      conn
-      |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
-    end
+    # else
+    #   conn
+    #   |> put_status(404)
+    #   |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
+    # end
   end
 
   def delete(conn, %{"id" => id}) do
-    if System.get_env("token") != nil do
+    # if System.get_env("token") != nil do
       where = [id: id]
       select = [:start, :end, :id]
       query = from WorkingTime, where: ^where, select: ^select
@@ -141,11 +141,11 @@ defmodule ApiWeb.WorkingTimeController do
         |> put_status(200)
         |> json(%{"response" => "Deleted"})
       end
-    else
-      conn
-      |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
-    end
+    # else
+    #   conn
+    #   |> put_status(404)
+    #   |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
+    # end
 
   end
 end

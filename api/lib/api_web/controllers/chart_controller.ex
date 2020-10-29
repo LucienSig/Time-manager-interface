@@ -10,7 +10,7 @@ defmodule ApiWeb.ChartController do
   action_fallback ApiWeb.FallbackController
 
   def index(conn, %{"userID" => id}) do
-    if System.get_env("token") != nil do
+    # if System.get_env("token") != nil do
       if id != "all" do
         where = [id: id]
         select = [:id]
@@ -40,11 +40,11 @@ defmodule ApiWeb.ChartController do
         |>put_status(200)
         |> json(chart)
       end
-    else
-      conn
-      |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
-    end
+    # else
+    #   conn
+    #   |> put_status(404)
+    #   |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
+    # end
   end
 
   def create(conn, %{"userID" => id, "line" => line, "bar" => bar, "donut" => donut}) do
@@ -71,7 +71,7 @@ defmodule ApiWeb.ChartController do
   end
 
   def show(conn, %{"userID" => id, "chartID" => chartID}) do
-    if System.get_env("token") != nil do
+    # if System.get_env("token") != nil do
       where = [user_id: id, id: chartID]
       select = [:line, :bar, :donut, :user_id, :id]
       query = from Chart, where: ^where, select: ^select
@@ -86,11 +86,11 @@ defmodule ApiWeb.ChartController do
         chart = Data.get_chart!(%{"userID" => id, "chartID" => chartID})
         render(conn, "show.json", chart: chart)
       end
-    else
-      conn
-      |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
-    end
+    # else
+    #   conn
+    #   |> put_status(404)
+    #   |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
+    # end
   end
 
   def change(conn, params) do

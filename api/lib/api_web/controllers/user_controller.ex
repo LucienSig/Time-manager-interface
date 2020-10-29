@@ -37,9 +37,10 @@ defmodule ApiWeb.UserController do
     end
   end
 
-  def show(conn, %{"userID" => id}) do
-    if id != "all" do
-      user = Accounts.get_user!(id)
+  def show(conn, params) do
+    # IO.inspect(conn.t())
+    if params["userID"] != "all" do
+      user = Accounts.get_user!(params["userID"])
       if user == nil do
         conn
         |> put_status(404)
