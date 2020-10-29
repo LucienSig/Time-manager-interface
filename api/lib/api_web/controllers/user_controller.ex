@@ -19,13 +19,17 @@ defmodule ApiWeb.UserController do
       |> json(%{
         "email": user.email,
         "username": user.username,
+        "role": user.role,
         "id": user.id
       })
     end
   end
 
-  def create(conn, params) do
-    with {:ok, %User{} = user} <- Accounts.create_user(params) do
+  def create(conn, %{"email" => email, "username" => username, "password" => passwd, "role" => role, "team" => team}) do
+    password = :crypto.hash(:sha256, passwd)
+    |>Base.encode16()
+    |> String.downcase()
+    with {:ok, %User{} = user} <- Accounts.create_user( %{"email" => email, "username" => username, "password" => password, "role" => role, "team" => team}) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.user_path(conn, :show, user))
@@ -33,9 +37,10 @@ defmodule ApiWeb.UserController do
     end
   end
 
-  def show(conn, %{"userID" => id}) do
-    if id != "all" do
-      user = Accounts.get_user!(id)
+  def show(conn, params) do
+    # IO.inspect(conn.t())
+    if params["userID"] != "all" do
+      user = Accounts.get_user!(params["userID"])
       if user == nil do
         conn
         |> put_status(404)
@@ -61,8 +66,20 @@ defmodule ApiWeb.UserController do
     user = Repo.get(User, params["userID"])
 
     if user do
-      with {:ok, %User{} = user} <- Accounts.update_user(user, params) do
-        render(conn, "show.json", user: user)
+      if params["password"] do
+        Accounts.update_user(user, params)
+        password = :crypto.hash(:sha256, params["password"])
+        |> Base.encode16()
+        |> String.downcase()
+        with {:ok, %User{} = user} <- Accounts.update_user(user, %{"password" => password}) do
+          conn
+          |> put_status(200)
+          |> json(%{"Success" => "Updated Password"})
+        end
+      else
+        with {:ok, %User{} = user} <- Accounts.update_user(user, params) do
+          render(conn, "show.json", user: user)
+        end
       end
     else
       conn
