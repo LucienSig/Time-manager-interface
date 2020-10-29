@@ -9,10 +9,16 @@ defmodule ApiWeb.LoginController do
 
   action_fallback ApiWeb.FallbackController
   def logout(conn, _params) do
-    System.delete_env("token")
-    conn
-    |> put_status(200)
-    |> json(%{"success" => "logged out"})
+    if System.get_env("token") != nil do
+      System.delete_env("token")
+      conn
+      |> put_status(200)
+      |> json(%{"success" => "logged out"})
+    else
+      conn
+      |> put_status(404)
+      |> json(%{"error" => "{'credentials': ['you are not logged in'}]"})
+    end
   end
 
   def login(conn, params) do
