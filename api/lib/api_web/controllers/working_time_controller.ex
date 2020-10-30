@@ -13,34 +13,39 @@ defmodule ApiWeb.WorkingTimeController do
     token_user = get_req_header(conn, "authorization")
     token_api = [System.get_env("token")]
     if token_user == token_api do
-      if id != "all" do
-        where = [id: id]
-        select = [:id]
-        query = from User, where: ^where, select: ^select
+      if System.get_env("user_id") == id or System.get_env("role") != "1" do
+        if id != "all" do
+          where = [id: id]
+          select = [:id]
+          query = from User, where: ^where, select: ^select
 
-        user = Repo.one(query)
+          user = Repo.one(query)
 
-        if user == nil do
-          conn
-          |> put_status(404)
-          |> json(%{"errors" => "{'credentials': ['user not found']}"})
+          if user == nil do
+            conn
+            |> put_status(404)
+            |> json(%{"errors" => "{'credentials': ['user not found']}"})
+          else
+            workingtimes = Time.list_workingtimes(%{"userID" => id})
+            render(conn, "index.json", workingtimes: workingtimes)
+          end
         else
-          workingtimes = Time.list_workingtimes(%{"userID" => id})
-          render(conn, "index.json", workingtimes: workingtimes)
+          clock = Repo.all(WorkingTime)
+          |> Enum.map(&%{start: &1.start, end: &1.end, id: &1.id, user: &1.user})
+
+          if clock == [] do
+            conn
+            |> put_status(404)
+            |> json(%{"error" => "{'credentials': ['working time not found']}"})
+          end
+          conn
+          |>put_status(200)
+          |> json(clock)
         end
       else
-        clock = Repo.all(WorkingTime)
-        |> Enum.map(&%{start: &1.start, end: &1.end, id: &1.id, user: &1.user})
-
-        if clock == [] do
-          conn
-          |> put_status(404)
-          |> json(%{"error" => "{'credentials': ['working time not found']}"})
-        end
-
         conn
-        |>put_status(200)
-        |> json(clock)
+        |> put_status(404)
+        |> json(%{"error" => "{'credentials': ['unauthorized'}]"})
       end
     else
       conn
