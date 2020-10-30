@@ -36,7 +36,7 @@ defmodule ApiWeb.UserController do
   def create(conn, params) do
     token_user = get_req_header(conn, "authorization")
     token_api = [System.get_env("token")]
-    if token_user == token_api and System.get_env("role") != "1" do
+    if token_user == token_api and System.get_env("role") == "3" do
       if params["email"] != nil and params["username"] != nil and params["password"] != nil and params["role"] != nil and params["team"] != nil do
         password = :crypto.hash(:sha256, params["password"])
         |>Base.encode16()
@@ -64,7 +64,7 @@ defmodule ApiWeb.UserController do
     token_api = [System.get_env("token")]
     if token_user == token_api do
       if System.get_env("user_id") == params["userID"] or System.get_env("role") != "1" do
-        if params["userID"] != "all" and System.get_env("role") == "3" do
+        if params["userID"] != "all" do
           user = Accounts.get_user!(params["userID"])
           if user == nil do
             conn
