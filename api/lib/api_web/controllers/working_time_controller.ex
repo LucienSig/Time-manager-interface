@@ -10,10 +10,10 @@ defmodule ApiWeb.WorkingTimeController do
   action_fallback ApiWeb.FallbackController
 
   def index(conn, %{"userID" => id}) do
-    token_user = get_req_header(conn, "authorization")
-    token_api = [System.get_env("token")]
-    if token_user == token_api do
-      if System.get_env("user_id") == id or System.get_env("role") != "1" do
+    token_user = get_req_header(conn, "authorization") |> List.first
+    {:ok, res} = Api.JWTHandle.decodeJWT(get_req_header(conn, "authorization") |> List.first)
+    if token_user == to_string(res.user_id) do
+      if to_string(res.user_id) == id or res.role > 1 do
         if id != "all" do
           where = [id: id]
           select = [:id]
@@ -55,9 +55,9 @@ defmodule ApiWeb.WorkingTimeController do
   end
 
   def create(conn, params) do
-    token_user = get_req_header(conn, "authorization")
-    token_api = [System.get_env("token")]
-    if token_user == token_api and System.get_env("role") != "1" do
+    token_user = get_req_header(conn, "authorization") |> List.first
+    {:ok, res} = Api.JWTHandle.decodeJWT(get_req_header(conn, "authorization") |> List.first)
+    if token_user == to_string(res.user_id) and res.role > 1 do
       if params["userID"] != nil and params["start"] != nil and params["end"] != nil do
         user = Repo.get(User, params["userID"])
 
@@ -92,10 +92,9 @@ defmodule ApiWeb.WorkingTimeController do
   end
 
   def show(conn, %{"userID" => id, "workingtimeID" => working_time_id}) do
-    token_user = get_req_header(conn, "authorization")
-    token_api = [System.get_env("token")]
-    if token_user == token_api do
-      # if System.get_env("token") != nil do
+    token_user = get_req_header(conn, "authorization") |> List.first
+    {:ok, res} = Api.JWTHandle.decodeJWT(get_req_header(conn, "authorization") |> List.first)
+    if token_user == to_string(res.user_id) do
         where = [user: id, id: working_time_id]
         select = [:start, :end, :id, :user]
         query = from WorkingTime, where: ^where, select: ^select
@@ -118,9 +117,9 @@ defmodule ApiWeb.WorkingTimeController do
   end
 
   def change(conn, params) do
-    token_user = get_req_header(conn, "authorization")
-    token_api = [System.get_env("token")]
-    if token_user == token_api and System.get_env("role") != "1" do
+    token_user = get_req_header(conn, "authorization") |> List.first
+    {:ok, res} = Api.JWTHandle.decodeJWT(get_req_header(conn, "authorization") |> List.first)
+    if token_user == to_string(res.user_id) and res.role > 1 do
     # if System.get_env("token") != nil do
       workingtime = Repo.get(WorkingTime, params["id"])
       if workingtime do
@@ -144,10 +143,8 @@ defmodule ApiWeb.WorkingTimeController do
   end
 
   def delete(conn, %{"id" => id}) do
-    token_user = get_req_header(conn, "authorization")
-    token_api = [System.get_env("token")]
-    if token_user == token_api and System.get_env("role") != "1" do
-    # if System.get_env("token") != nil do
+    {:ok, res} = Api.JWTHandle.decodeJWT(get_req_header(conn, "authorization") |> List.first)
+    if res.role > 3 do
       where = [id: id]
       select = [:start, :end, :id]
       query = from WorkingTime, where: ^where, select: ^select
