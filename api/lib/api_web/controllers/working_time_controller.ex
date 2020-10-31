@@ -10,9 +10,7 @@ defmodule ApiWeb.WorkingTimeController do
   action_fallback ApiWeb.FallbackController
 
   def index(conn, %{"userID" => id}) do
-    token_user = get_req_header(conn, "authorization") |> List.first
     {:ok, res} = Api.JWTHandle.decodeJWT(get_req_header(conn, "authorization") |> List.first)
-    if token_user == to_string(res.user_id) do
       if to_string(res.user_id) == id or res.role > 1 do
         if id != "all" do
           where = [id: id]
@@ -47,17 +45,11 @@ defmodule ApiWeb.WorkingTimeController do
         |> put_status(404)
         |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
       end
-    else
-      conn
-      |> put_status(404)
-      |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
-    end
   end
 
   def create(conn, params) do
-    token_user = get_req_header(conn, "authorization") |> List.first
     {:ok, res} = Api.JWTHandle.decodeJWT(get_req_header(conn, "authorization") |> List.first)
-    if token_user == to_string(res.user_id) and res.role > 1 do
+    if params["userID"] == to_string(res.user_id) and res.role > 1 do
       if params["userID"] != nil and params["start"] != nil and params["end"] != nil do
         user = Repo.get(User, params["userID"])
 
@@ -92,9 +84,8 @@ defmodule ApiWeb.WorkingTimeController do
   end
 
   def show(conn, %{"userID" => id, "workingtimeID" => working_time_id}) do
-    token_user = get_req_header(conn, "authorization") |> List.first
     {:ok, res} = Api.JWTHandle.decodeJWT(get_req_header(conn, "authorization") |> List.first)
-    if token_user == to_string(res.user_id) do
+    if id == to_string(res.user_id) do
         where = [user: id, id: working_time_id]
         select = [:start, :end, :id, :user]
         query = from WorkingTime, where: ^where, select: ^select
@@ -117,9 +108,8 @@ defmodule ApiWeb.WorkingTimeController do
   end
 
   def change(conn, params) do
-    token_user = get_req_header(conn, "authorization") |> List.first
     {:ok, res} = Api.JWTHandle.decodeJWT(get_req_header(conn, "authorization") |> List.first)
-    if token_user == to_string(res.user_id) and res.role > 1 do
+    if params["userID"] == to_string(res.user_id) and res.role > 1 do
     # if System.get_env("token") != nil do
       workingtime = Repo.get(WorkingTime, params["id"])
       if workingtime do

@@ -8,28 +8,21 @@ defmodule ApiWeb.UserController do
   action_fallback ApiWeb.FallbackController
 
   def index(conn,  %{"email" => email, "username" => username}) do
-    token_user = get_req_header(conn, "authorization") |> List.first
     {:ok, res} = Api.JWTHandle.decodeJWT(get_req_header(conn, "authorization") |> List.first)
-    if token_user == to_string(res.user_id) do
-      user = Accounts.list_users(%{"email" => email, "username" => username})
-      if user == nil do
-        conn
-        |> put_status(404)
-        |> json(%{"errors" => %{"credentials" => ["user not found"]}})
-      else
-        conn
-        |> put_status(201)
-        |> json(%{
-          email: user.email,
-          username: user.username,
-          role: user.role,
-          id: user.id
-        })
-      end
+    user = Accounts.list_users(%{"email" => email, "username" => username})
+    if user == nil do
+      conn
+      |> put_status(404)
+      |> json(%{"errors" => %{"credentials" => ["user not found"]}})
     else
       conn
-      |> put_status(401)
-      |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
+      |> put_status(201)
+      |> json(%{
+        email: user.email,
+        username: user.username,
+        role: user.role,
+        id: user.id
+      })
     end
   end
 
@@ -80,7 +73,7 @@ defmodule ApiWeb.UserController do
 
   def show(conn, params) do
     {:ok, res} = Api.JWTHandle.decodeJWT(get_req_header(conn, "authorization") |> List.first)
-
+    IO.inspect(res)
     if to_string(res.user_id) == params["userID"] or res.role != 1 do
       if params["userID"] != "all" do
         user = Accounts.get_user!(params["userID"])
@@ -111,9 +104,8 @@ defmodule ApiWeb.UserController do
   end
 
   def update(conn, params) do
-    token_user = get_req_header(conn, "authorization") |> List.first
     {:ok, res} = Api.JWTHandle.decodeJWT(get_req_header(conn, "authorization") |> List.first)
-    if token_user == to_string(res.user_id) and res.role == 3 do
+    if params["userID"] == to_string(res.user_id) and res.role == 3 do
       user = Repo.get(User, params["userID"])
 
       if user do
@@ -145,9 +137,8 @@ defmodule ApiWeb.UserController do
   end
 
   def delete(conn, %{"userID" => id}) do
-    token_user = get_req_header(conn, "authorization") |> List.first
     {:ok, res} = Api.JWTHandle.decodeJWT(get_req_header(conn, "authorization") |> List.first)
-    if token_user == to_string(res.user_id) and res.role == 3 do
+    if id == to_string(res.user_id) and res.role == 3 do
       user = Repo.get(User, id)
 
       if user do
