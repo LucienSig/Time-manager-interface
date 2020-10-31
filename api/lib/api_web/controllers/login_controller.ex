@@ -35,17 +35,17 @@ defmodule ApiWeb.LoginController do
         else
           conn
           |> put_status(404)
-          |> json(%{"errors" => "{'credentials': ['wrong email/password']}"})
+          |> json(%{"errors" => %{"credentials" => ["wrong email/password"]}})
         end
       else
         conn
         |> put_status(404)
-        |> json(%{"errors" => "{'credentials': ['wrong email/password']}"})
+        |> json(%{"errors" => %{"credentials" => ["wrong email/password"]}})
       end
     else
       conn
       |> put_status(401)
-      |> json(%{"errors" => "{'params': ['missing parameter']}"})
+      |> json(%{"errors" => %{"params" => ["missing parameter"]}})
     end
   end
 end

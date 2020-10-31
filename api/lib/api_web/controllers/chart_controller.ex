@@ -24,7 +24,7 @@ defmodule ApiWeb.ChartController do
           if user == nil do
             conn
             |> put_status(404)
-            |> json(%{"errors" => "{'credentials': ['user not found']}"})
+            |> json(%{"errors" => %{"credentials" => ["user not found"]}})
           else
             charts = Data.list_charts(%{"userID" => id})
             render(conn, "index.json", charts: charts)
@@ -36,7 +36,7 @@ defmodule ApiWeb.ChartController do
           if chart == [] do
             conn
             |> put_status(404)
-            |> json(%{"error" => "{'credentials': ['chart not found']}"})
+            |> json(%{"error" => %{"credentials" => ["chart not found"]}})
           end
 
           conn
@@ -46,12 +46,12 @@ defmodule ApiWeb.ChartController do
       else
         conn
         |> put_status(404)
-        |> json(%{"error" => "{'credentials': ['unauthorized']"})
+        |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
       end
     else
       conn
       |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['unauthorized']"})
+      |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
     end
   end
 
@@ -78,17 +78,17 @@ defmodule ApiWeb.ChartController do
         else
           conn
           |> put_status(404)
-          |> json(%{"errors" => "{'credentials': ['user not found']}"})
+          |> json(%{"errors" => %{"credentials" => ["user not found"]}})
         end
       else
         conn
         |> put_status(400)
-        |> json(%{"errors" => "{'params': ['missing parameter']}"})
+        |> json(%{"errors" => %{"params"=> ["missing parameter"]}})
       end
     else
       conn
       |> put_status(401)
-      |>json(%{"errors" => "{'credentials': ['unauthorized']}"})
+      |>json(%{"errors" => %{"credentials" => ["unauthorized"]}})
     end
   end
 
@@ -106,7 +106,7 @@ defmodule ApiWeb.ChartController do
         if chart == nil do
           conn
           |> put_status(404)
-          |> json(%{"errors" => "{'credentials': ['working times not found']}"})
+          |> json(%{"errors" => %{"credentials" => ["working times not found"]}})
         else
           chart = Data.get_chart!(%{"userID" => id, "chartID" => chartID})
           render(conn, "show.json", chart: chart)
@@ -114,12 +114,12 @@ defmodule ApiWeb.ChartController do
       else
         conn
         |> put_status(404)
-        |> json(%{"error" => "{'credentials': ['unauthorized'}]"})
+        |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
       end
     else
       conn
       |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['unauthorized'}]"})
+      |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
     end
   end
 
@@ -143,13 +143,13 @@ defmodule ApiWeb.ChartController do
           {:error, result} ->
             conn
             |> put_status(404)
-            |> json(%{"errors" => "{'credentials': ['chart not found']}"})
+            |> json(%{"errors" => %{"credentials" => ["chart not found"]}})
         end
       end
     else
       conn
       |> put_status(401)
-      |> json(%{"errors" => "{'credentials': ['unauthorized']}"})
+      |> json(%{"errors" => %{"credentials" => ["unauthorized"]}})
     end
   end
 end

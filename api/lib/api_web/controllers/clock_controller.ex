@@ -24,7 +24,7 @@ defmodule ApiWeb.ClockController do
             if clock == [] do
               conn
               |> put_status(404)
-              |> json(%{"errors" => "{'credentials': ['no clocks for selected user']}"})
+              |> json(%{"errors" => %{"credentials" => ["no clocks for selected user"]}})
             else
               render(conn, "index.json", clocks: clock)
             end
@@ -34,7 +34,7 @@ defmodule ApiWeb.ClockController do
           else
             conn
             |> put_status(404)
-            |> json(%{"error" => "{'credentials' : ['no user found']}"})
+            |> json(%{"error" => %{"credentials" => ["no user found"]}})
           end
         else
           clock = Repo.all(Clock)
@@ -42,7 +42,7 @@ defmodule ApiWeb.ClockController do
           if clock == [] do
             conn
             |> put_status(404)
-            |> json(%{"error" => "{'credentials': ['clock not found']}"})
+            |> json(%{"error" => %{"credentials" => ["clock not found"]}})
           end
           conn
           |>put_status(200)
@@ -51,12 +51,12 @@ defmodule ApiWeb.ClockController do
       else
         conn
         |> put_status(404)
-        |> json(%{"error" => "{'credentials': ['unauthorized'}]"})
+        |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
       end
     else
       conn
       |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['unauthorized'}]"})
+      |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
     end
   end
 
@@ -95,17 +95,17 @@ defmodule ApiWeb.ClockController do
         else
           conn
           |> put_status(404)
-          |> json(%{"errors" => "{'credentials': ['no user found']}"})
+          |> json(%{"errors" => %{"credentials" => ["no user found"]}})
         end
       else
         conn
         |> put_status(404)
-        |> json(%{"error" => "{'credentials': ['unauthorized'}]"})
+        |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
       end
     else
       conn
       |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['unauthorized'}]"})
+      |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
     end
   end
 

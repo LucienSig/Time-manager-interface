@@ -24,7 +24,7 @@ defmodule ApiWeb.WorkingTimeController do
           if user == nil do
             conn
             |> put_status(404)
-            |> json(%{"errors" => "{'credentials': ['user not found']}"})
+            |> json(%{"errors" => %{"credentials" => ["user not found"]}})
           else
             workingtimes = Time.list_workingtimes(%{"userID" => id})
             render(conn, "index.json", workingtimes: workingtimes)
@@ -36,7 +36,7 @@ defmodule ApiWeb.WorkingTimeController do
           if clock == [] do
             conn
             |> put_status(404)
-            |> json(%{"error" => "{'credentials': ['working time not found']}"})
+            |> json(%{"error" => %{"credentials" => ["working time not found"]}})
           end
           conn
           |>put_status(200)
@@ -45,12 +45,12 @@ defmodule ApiWeb.WorkingTimeController do
       else
         conn
         |> put_status(404)
-        |> json(%{"error" => "{'credentials': ['unauthorized'}]"})
+        |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
       end
     else
       conn
       |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['unauthorized'}]"})
+      |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
     end
   end
 
@@ -77,17 +77,17 @@ defmodule ApiWeb.WorkingTimeController do
         else
           conn
           |> put_status(404)
-          |> json(%{"errors" => "{'credentials': ['user not found']}"})
+          |> json(%{"errors" => %{"credentials" => ["user not found"]}})
         end
       else
         conn
         |> put_status(401)
-        |> json(%{"errors" => "{'params': ['missing parameter']}"})
+        |> json(%{"errors" => %{"params": ["missing parameter"]}})
       end
     else
       conn
       |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['unauthorized'}]"})
+      |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
     end
   end
 
@@ -104,7 +104,7 @@ defmodule ApiWeb.WorkingTimeController do
         if workingtime == nil do
           conn
           |> put_status(404)
-          |> json(%{"errors" => "{'credentials': ['working times not found']}"})
+          |> json(%{"errors" => %{"credentials" => ["working times not found"]}})
         else
           working_time = Time.get_working_time!(%{"userID" => id, "workingtimeID" => working_time_id})
           render(conn, "show.json", working_time: working_time)
@@ -112,7 +112,7 @@ defmodule ApiWeb.WorkingTimeController do
     else
       conn
       |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['unauthorized'}]"})
+      |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
     end
   end
 
@@ -132,13 +132,13 @@ defmodule ApiWeb.WorkingTimeController do
           {:error, result} ->
             conn
             |> put_status(404)
-            |> json(%{"errors" => "{'credentials': ['workingtime not found']}"})
+            |> json(%{"errors" => %{"credentials" => ["workingtime not found"]}})
         end
       end
     else
       conn
       |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['unauthorized'}]"})
+      |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
     end
   end
 
@@ -154,7 +154,7 @@ defmodule ApiWeb.WorkingTimeController do
       if workingtime == nil do
         conn
         |> put_status(404)
-        |> json(%{"errors" => "{'credentials': ['working times not found']}"})
+        |> json(%{"errors" => %{"credentials" => ["working times not found"]}})
       else
         workspace = from(x in WorkingTime, where: x.id == ^id) |> Repo.delete_all
 
@@ -165,7 +165,7 @@ defmodule ApiWeb.WorkingTimeController do
     else
       conn
       |> put_status(404)
-      |> json(%{"error" => "{'credentials': ['unauthorized'}]"})
+      |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
     end
 
   end

@@ -15,7 +15,7 @@ defmodule ApiWeb.UserController do
       if user == nil do
         conn
         |> put_status(404)
-        |> json(%{"errors" => "{'credentials': ['user not found']}"})
+        |> json(%{"errors" => %{"credentials" => ["user not found"]}})
       else
         conn
         |> put_status(201)
@@ -29,7 +29,7 @@ defmodule ApiWeb.UserController do
     else
       conn
       |> put_status(401)
-      |> json(%{"error" => "{'credentials': ['unauthorized']}"})
+      |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
     end
   end
 
@@ -50,7 +50,7 @@ defmodule ApiWeb.UserController do
         else
           conn
           |> put_status(401)
-          |> json(%{"error" => "{'params': ['missing parameter']}"})
+          |> json(%{"error" => %{'params': ["missing parameter"]}})
         end
       else
         {:ok, res} = Api.JWTHandle.decodeJWT(get_req_header(conn, "authorization") |> List.first)
@@ -68,25 +68,26 @@ defmodule ApiWeb.UserController do
           else
             conn
             |> put_status(401)
-            |> json(%{"error" => "{'params': ['missing parameter']}"})
+            |> json(%{"error" => %{'params': ["missing parameter"]}})
           end
         else
           conn
           |> put_status(401)
-          |> json(%{"error" => "{'credentials': ['unauthorized']}"})
+          |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
         end
       end
   end
 
   def show(conn, params) do
     {:ok, res} = Api.JWTHandle.decodeJWT(get_req_header(conn, "authorization") |> List.first)
+
     if to_string(res.user_id) == params["userID"] or res.role != 1 do
       if params["userID"] != "all" do
         user = Accounts.get_user!(params["userID"])
         if user == nil do
           conn
           |> put_status(404)
-          |> json(%{"error" => "{'credentials': ['user not found']}"})
+          |> json(%{"error" => %{"credentials" => ["user not found"]}})
         end
         render(conn, "show.json", user: user)
       else
@@ -95,7 +96,7 @@ defmodule ApiWeb.UserController do
         if user == [] do
           conn
           |> put_status(404)
-          |> json(%{"error" => "{'credentials': ['user not found']}"})
+          |> json(%{"error" => %{"credentials" => ["user not found"]}})
         end
 
         conn
@@ -105,7 +106,7 @@ defmodule ApiWeb.UserController do
     else
       conn
       |> put_status(401)
-      |> json(%{"error" => "{'credentials': ['unauthorized']}"})
+      |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
     end
   end
 
@@ -124,7 +125,7 @@ defmodule ApiWeb.UserController do
           with {:ok, %User{} = user} <- Accounts.update_user(user, %{"password" => password}) do
             conn
             |> put_status(200)
-            |> json(%{"Success" => "Updated Password"})
+            |> json(%{"Success" => "Password updated"})
           end
         else
           with {:ok, %User{} = user} <- Accounts.update_user(user, params) do
@@ -134,12 +135,12 @@ defmodule ApiWeb.UserController do
       else
         conn
         |> put_status(404)
-        |> json(%{"errors" => "{'credentials': ['user not found']}"})
+        |> json(%{"errors" => %{"credentials" => ["user not found"]}})
       end
     else
       conn
       |> put_status(401)
-      |> json(%{"error" => "{'credentials': ['unauthorized']}"})
+      |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
     end
   end
 
@@ -160,12 +161,12 @@ defmodule ApiWeb.UserController do
       else
         conn
         |> put_status(404)
-        |> json(%{"errors" => "{'credentials': ['user not found']}"})
+        |> json(%{"errors" => %{"credentials" => ["user not found"]}})
       end
     else
       conn
       |> put_status(401)
-      |> json(%{"error" => "{'credentials': ['unauthorized']}"})
+      |> json(%{"error" => %{"credentials" => ["unauthorized"]}})
     end
   end
 end
