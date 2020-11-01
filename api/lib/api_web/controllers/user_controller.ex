@@ -138,7 +138,7 @@ defmodule ApiWeb.UserController do
 
   def delete(conn, %{"userID" => id}) do
     {:ok, res} = Api.JWTHandle.decodeJWT(get_req_header(conn, "authorization") |> List.first)
-    if id == to_string(res.user_id) and res.role == 3 do
+    if res.role == 3 do
       user = Repo.get(User, id)
 
       if user do
